@@ -1,0 +1,17 @@
+{
+    "Equipes":[
+        {"dossard":"1", "parcours":"Expert"},
+        {"dossard":"2", "parcours":"Expert"},
+        {"dossard":"3", "parcours":"Expert"},
+        {"dossard":"101", "parcours":"Sportif"},
+        {"dossard":"102", "parcours":"Sportif"},
+        {"dossard":"103", "parcours":"Sportif"},
+        {"dossard":"104", "parcours":"Sportif"},
+        {"dossard":"105", "parcours":"Sportif"},
+        {"dossard":"201", "parcours":"Découverte"},
+        {"dossard":"202", "parcours":"Découverte"},
+        {"dossard":"203", "parcours":"Découverte"},
+        {"dossard":"204", "parcours":"Découverte"}
+    ]
+
+}

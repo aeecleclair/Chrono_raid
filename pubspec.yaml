@@ -1,0 +1,34 @@
+name: chrono_raid
+description: "A new Flutter project."
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^2.1.1
+  flutter_hooks: ^0.20.0
+  sqflite: ^2.4.1
+  path: ^1.8.0
+  path_provider: any
+  sqflite_common_ffi: ^2.3.4
+  sqlite3_flutter_libs: ^0.5.26
+  uuid: ^4.5.1
+  fluttertoast: ^8.0.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/Equipes.json
+
