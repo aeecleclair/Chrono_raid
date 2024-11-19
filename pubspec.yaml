@@ -19,7 +19,7 @@ dependencies:
   sqflite_common_ffi: ^2.3.4
   sqlite3_flutter_libs: ^0.5.26
   uuid: ^4.5.1
-  fluttertoast: ^8.0.9
+  toastification: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -31,4 +31,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/Equipes.json
+    - assets/Epreuves.json
 

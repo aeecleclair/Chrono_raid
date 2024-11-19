@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:chrono_raid/ui/equipes.dart';
+import 'package:chrono_raid/ui/functions.dart';
 import 'package:chrono_raid/ui/temps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,15 +18,18 @@ class OngletTest extends HookWidget {
     final dbm = DatabaseManager();
 
     void envoyer() async {
-      await dbm.createTableEquipes();
-      String txt = '';
-      final List<Temps> liste = (await dbm.getTemps()).toList();
-      for (int i=0; i < liste.length; i++) {
-        txt += liste[i].dossard.toString() + ' ' + liste[i].parcours.toString() + ' ' + liste[i].date.toString() + '\n';
-      }
-      test.value = txt;
+      // await dbm.createTableEquipes();
+      // String txt = '';
+      // final List<Temps> liste = (await dbm.getTemps()).toList();
+      // for (int i=0; i < liste.length; i++) {
+      //   txt += liste[i].dossard.toString() + ' ' + liste[i].parcours.toString() + ' ' + liste[i].date.toString() + '\n';
+      // }
+      // test.value = txt;
       //final a = (await dbm.getParcoursByDossard(1));
-      //print(a);
+      print('a');
+      final tamere = await readJsonEpreuves();
+      test.value = tamere["Expert"].toString();
+
     }
 
     return Center(

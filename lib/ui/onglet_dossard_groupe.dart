@@ -1,5 +1,6 @@
 import 'package:chrono_raid/ui/database.dart';
 import 'package:chrono_raid/ui/equipes.dart';
+import 'package:chrono_raid/ui/temps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -20,7 +21,11 @@ class OngletDossardGroupe extends HookWidget {
 
     void envoyer() async {
       List<Equipes> equipes = await dbm.getEquipes(parcours.value);
-      info.value = equipes.map((x) => x.dossard).toList().toString();
+      List<int> dossards = equipes.map((x) => x.dossard).toList();
+      String date = DateTime.now().toIso8601String();
+      for (int i=0; i<dossards.length; i++) {
+        dbm.createTemps(Temps(dossards[i], date, parcours.value));
+      }
     }
 
     return Center(

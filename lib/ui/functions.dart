@@ -11,3 +11,15 @@ Future<List<Map<String,String>>> readJsonEquipes() async {
   }
   return data2;
 }
+
+Future<Map<String, List<String>>> readJsonEpreuves() async {
+  final String response = await rootBundle.loadString('assets/Epreuves.json');
+  final Map<String, dynamic> data = json.decode(response);
+  final Map<String, List<String>> data2 = (data["Epreuves"] as Map<String, dynamic>).map(
+    (key, value) => MapEntry(
+      key,
+      List<String>.from(value),
+    ),
+  );
+  return data2;
+}
