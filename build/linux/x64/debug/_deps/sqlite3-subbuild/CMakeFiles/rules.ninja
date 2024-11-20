@@ -23,7 +23,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /usr/bin/cmake --regenerate-during-build -S/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild -B/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild
+  command = /usr/bin/cmake --regenerate-during-build -S/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild -B/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild
   description = Re-running CMake...
   generator = 1
 

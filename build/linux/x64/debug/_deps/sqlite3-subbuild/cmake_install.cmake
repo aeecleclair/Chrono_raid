@@ -1,4 +1,4 @@
-# Install script for directory: /home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild
+# Install script for directory: /home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

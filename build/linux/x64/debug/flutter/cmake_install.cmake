@@ -1,8 +1,8 @@
-# Install script for directory: /home/clement/Documents/appli_chrono_raid/chrono_raid/linux/flutter
+# Install script for directory: /home/clement/Chrono_raid/linux/flutter
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/bundle")
+  set(CMAKE_INSTALL_PREFIX "/home/clement/Chrono_raid/build/linux/x64/debug/bundle")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 

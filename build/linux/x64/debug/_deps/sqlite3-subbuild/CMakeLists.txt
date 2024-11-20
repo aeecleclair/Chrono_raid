@@ -20,8 +20,8 @@ project(sqlite3-populate NONE)
 include(ExternalProject)
 ExternalProject_Add(sqlite3-populate
                      "UPDATE_DISCONNECTED" "False" "DOWNLOAD_EXTRACT_TIMESTAMP" "NEW" "EXTERNALPROJECT_INTERNAL_ARGUMENT_SEPARATOR" "URL" "https://sqlite.org/2024/sqlite-autoconf-3470000.tar.gz"
-                    SOURCE_DIR          "/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-src"
-                    BINARY_DIR          "/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-build"
+                    SOURCE_DIR          "/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-src"
+                    BINARY_DIR          "/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-build"
                     CONFIGURE_COMMAND   ""
                     BUILD_COMMAND       ""
                     INSTALL_COMMAND     ""

@@ -1,4 +1,5 @@
-import 'package:chrono_raid/ui/onglet3.dart';
+import 'package:chrono_raid/ui/onglet_compte.dart';
+import 'package:chrono_raid/ui/onglet_test.dart';
 import 'package:chrono_raid/ui/onglet_dossard_groupe.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: DefaultTabController(
-        length: 3,
+        length: 4,
         child: Scaffold(
         appBar: AppBar(
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -51,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
               tabs: [
                 Tab(icon: Icon(Icons.person)),
                 Tab(icon: Icon(Icons.group)),
+                Tab(icon: Icon(Icons.supervisor_account_outlined)),
                 Tab(icon: Icon(Icons.speaker_notes)),
               ],
             ),
@@ -63,7 +65,10 @@ class _MyHomePageState extends State<MyHomePage> {
               // Onglet dossard groupe
               OngletDossardGroupe(),
 
-              // Onglet remarque
+              // Onglet compte
+              OngletCompte(),
+              
+              // Onglet test
               OngletTest(),
             ],
           ),

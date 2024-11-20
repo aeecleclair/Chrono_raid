@@ -22,14 +22,14 @@ function(check_file_hash has_hash hash_is_good)
   set("${has_hash}" TRUE PARENT_SCOPE)
 
   message(STATUS "verifying file...
-       file='/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz'")
+       file='/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz'")
 
-  file("" "/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz" actual_value)
+  file("" "/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz" actual_value)
 
   if(NOT "${actual_value}" STREQUAL "")
     set("${hash_is_good}" FALSE PARENT_SCOPE)
     message(STATUS " hash of
-    /home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz
+    /home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz
   does not match expected value
     expected: ''
       actual: '${actual_value}'")
@@ -71,7 +71,7 @@ function(sleep_before_download attempt)
   execute_process(COMMAND "${CMAKE_COMMAND}" -E sleep "${sleep_seconds}")
 endfunction()
 
-if("/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz" STREQUAL "")
+if("/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz" STREQUAL "")
   message(FATAL_ERROR "LOCAL can't be empty")
 endif()
 
@@ -79,32 +79,32 @@ if("https://sqlite.org/2024/sqlite-autoconf-3470000.tar.gz" STREQUAL "")
   message(FATAL_ERROR "REMOTE can't be empty")
 endif()
 
-if(EXISTS "/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz")
+if(EXISTS "/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz")
   check_file_hash(has_hash hash_is_good)
   if(has_hash)
     if(hash_is_good)
       message(STATUS "File already exists and hash match (skip download):
-  file='/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz'
+  file='/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz'
   =''"
       )
       return()
     else()
       message(STATUS "File already exists but hash mismatch. Removing...")
-      file(REMOVE "/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz")
+      file(REMOVE "/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz")
     endif()
   else()
     message(STATUS "File already exists but no hash specified (use URL_HASH):
-  file='/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz'
+  file='/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz'
 Old file will be removed and new file downloaded from URL."
     )
-    file(REMOVE "/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz")
+    file(REMOVE "/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz")
   endif()
 endif()
 
 set(retry_number 5)
 
 message(STATUS "Downloading...
-   dst='/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz'
+   dst='/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz'
    timeout='none'
    inactivity timeout='none'"
 )
@@ -126,7 +126,7 @@ foreach(i RANGE ${retry_number})
 
       file(
         DOWNLOAD
-        "${url}" "/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz"
+        "${url}" "/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz"
         SHOW_PROGRESS
         # no TIMEOUT
         # no INACTIVITY_TIMEOUT
@@ -143,7 +143,7 @@ foreach(i RANGE ${retry_number})
         check_file_hash(has_hash hash_is_good)
         if(has_hash AND NOT hash_is_good)
           message(STATUS "Hash mismatch, removing...")
-          file(REMOVE "/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz")
+          file(REMOVE "/home/clement/Chrono_raid/build/linux/x64/debug/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite-autoconf-3470000.tar.gz")
         else()
           message(STATUS "Downloading... done")
           return()

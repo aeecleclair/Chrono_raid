@@ -71,7 +71,7 @@ rule CXX_SHARED_LIBRARY_LINKER__sqlite3_flutter_libs_plugin_Debug
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /usr/bin/cmake --regenerate-during-build -S/home/clement/Documents/appli_chrono_raid/chrono_raid/linux -B/home/clement/Documents/appli_chrono_raid/chrono_raid/build/linux/x64/debug
+  command = /usr/bin/cmake --regenerate-during-build -S/home/clement/Chrono_raid/linux -B/home/clement/Chrono_raid/build/linux/x64/debug
   description = Re-running CMake...
   generator = 1
 
