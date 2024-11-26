@@ -39,7 +39,8 @@ class DatabaseManager {
     // On récupère le chemin vers la base de donné
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    //await deleteDatabase(path);
+    // await deleteDatabase(path);
+    // print('db supprimée');
     // On ouvre la basse de donnée
     return await openDatabase(path, version: 1, onCreate: _createDB);
   }
@@ -109,11 +110,58 @@ class DatabaseManager {
     List<Equipes> r = result.map((e) => Equipes.fromJson(e)).toList();
     return r;
   }
+  
+Future<Map<String, int>> countEquipes() async {
+  final db = await instance.database;
+  final result = await db.rawQuery('''
+    SELECT parcours, COUNT(*) as count
+    FROM $tableEquipes
+    GROUP BY parcours
+  ''');
 
-  Future createTemps(Temps t) async {
+  final Map<String, int> r = {
+    "Expert": 0,
+    "Sportif": 0,
+    "Découverte": 0,
+  };
+
+  for (var row in result) {
+    final parcours = row["parcours"] as String?;
+    final count = row["count"] as int?;
+    if (parcours != null && count != null) {
+      r[parcours] = count;
+    }
+  }
+
+  return r;
+}
+
+  Future<String> createTemps(Temps t) async {
+    final nb_epreuves = ((await readJsonEpreuves())[t.parcours]!).length;
     final db = await instance.database;
-    final json = t.toJson();
-    await db.insert(tableTemps, json); 
+    final result = await db.rawQuery('''
+      SELECT COUNT(*) as c
+      FROM $tableTemps
+      WHERE dossard = ${t.dossard}
+    ''');
+    final int nb_temps = result[0]['c'] as int;
+    if (nb_temps >= nb_epreuves) {
+      return 'error'; //provisoire
+    }
+    else {
+      final json = t.toJson();
+      await db.insert(tableTemps, json);
+      return ''; //provisoire
+    }
+  }
+
+  Future editTemps(Temps t, String date) async {
+    final db = await instance.database;
+    await db.execute('''
+      UPDATE $tableTemps
+      SET ${TempsField.date} = '$date'
+      WHERE ${TempsField.id} = '${t.id}'
+    ''');
   }
 
   Future<List<Temps>> getTemps() async {
@@ -122,6 +170,56 @@ class DatabaseManager {
     final result = await db.query(tableTemps, orderBy: orderBy);
     List<Temps> r = result.map((e) => Temps.fromJson(e)).toList();
     return r;
+  }
+
+  Future<List<Temps>> getTempsbyDossard(dossard) async {
+    final db = await instance.database;
+    const orderBy = '${TempsField.date} ASC';
+    String whereString = "dossard = '$dossard'";
+    final result = await db.query(tableTemps, orderBy: orderBy, where: whereString);
+    List<Temps> r = result.map((e) => Temps.fromJson(e)).toList();
+    return r;
+  }
+
+  Future<Map<String,Map<String,int>>> compteTemps() async {
+    final epreuves = await readJsonEpreuves();
+    final c = await countEquipes();
+    Map<String,Map<String,int>> data = {for (var parcours in ["Expert", "Sportif", "Découverte"]) parcours : {for (var epreuve in (epreuves[parcours]!)) epreuve : (epreuve==epreuves[parcours]![0] ? c[parcours]! : 0) }};
+    final db = await instance.database;
+
+    final result = await db.rawQuery('''
+      SELECT parcours, time_count, COUNT(*) as dossard_count
+      FROM (
+        SELECT parcours, dossard, COUNT(*) as time_count
+        FROM $tableTemps
+        GROUP BY parcours, dossard
+      ) AS counts
+      GROUP BY parcours, time_count
+      ORDER BY parcours ASC, time_count ASC
+    ''');
+
+    final counts = result.map((row) => {
+      'parcours': row['parcours'].toString(),
+      'time_count': row['time_count'].toString(),
+      'dossard_count': row['dossard_count'].toString(),
+    }).toList();
+
+    for (var count in counts) {
+      final parcours = count["parcours"]!;
+      final timeCount = int.parse(count["time_count"]!);
+      final dossardCount = int.parse(count["dossard_count"]!);
+      final firstEpreuve = epreuves[parcours]![0];
+
+      if (timeCount < epreuves[parcours]!.length) {
+        final currentEpreuve = epreuves[parcours]![timeCount];
+        data[parcours]![currentEpreuve] =
+            (data[parcours]![currentEpreuve] ?? 0) + dossardCount;
+      }
+
+      data[parcours]![firstEpreuve] =
+          (data[parcours]![firstEpreuve] ?? 0) - dossardCount;
+    }
+    return data;
   }
 
 }

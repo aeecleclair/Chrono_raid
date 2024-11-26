@@ -16,8 +16,8 @@ Future<List<Map<String,String>>> readJsonEquipes() async {
 
 Future<Map<String, List<String>>> readJsonEpreuves() async {
   final String response = await rootBundle.loadString('assets/Epreuves.json');
-  final Map<String, dynamic> data = json.decode(response);
-  final Map<String, List<String>> data2 = (data["Epreuves"] as Map<String, dynamic>).map(
+  final Map<String, dynamic> data = json.decode(response)["Epreuves"];
+  final Map<String, List<String>> data2 = data.map(
     (key, value) => MapEntry(
       key,
       List<String>.from(value),

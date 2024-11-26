@@ -1,5 +1,5 @@
 
-import 'package:uuid/v4.dart';
+import 'package:uuid/uuid.dart';
 
 const String tableTemps = "temps";
 
@@ -24,11 +24,16 @@ class Temps {
   String date = "";
   String parcours = "";
 
-  Temps(int Dossard, String Date, String Parcours) {
-    id = UuidV4().toString();
+  Temps(int Dossard, String Date, String Parcours, {String Id = ""}) {
+    id = Id.isEmpty ? Uuid().v4() : Id;
     dossard = Dossard;
     date = Date;
     parcours = Parcours;
+  }
+
+  @override
+  String toString(){
+    return "Temps(id: $id, dossard: $dossard, parcours: $parcours, date: $date)";
   }
 
   static Temps fromJson(Map<String, Object?> json) =>
@@ -36,6 +41,7 @@ class Temps {
         json[TempsField.dossard] as int,
         json[TempsField.date] as String,
         json[TempsField.parcours] as String,
+        Id: json[TempsField.id] as String,
       );
 
   Map<String, Object> toJson() =>

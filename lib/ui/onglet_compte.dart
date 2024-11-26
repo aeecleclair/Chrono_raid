@@ -1,10 +1,4 @@
-import 'dart:convert';
-
-import 'package:chrono_raid/ui/equipes.dart';
-import 'package:chrono_raid/ui/functions.dart';
-import 'package:chrono_raid/ui/temps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import 'database.dart';
@@ -14,29 +8,41 @@ class OngletCompte extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final test = useState('');
     final dbm = DatabaseManager();
 
-    void envoyer() async {
-      print('a');
-      final tamere = await readJsonEpreuves();
-      test.value = tamere["Expert"].toString();
+    return FutureBuilder<Map<String,Map<String,int>>>(
+      future: dbm.compteTemps(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Erreur: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('Aucune donnée disponible'));
+        }
 
-    }
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-            FloatingActionButton(
-            onPressed: envoyer,
-            child: const Text('Afficher'),
+        final data = snapshot.data!;
+        return Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              for (var parcours in ["Expert", "Sportif", "Découverte"])
+                Column(
+                  children: <Widget>[
+                  Text(parcours,
+                    style: TextStyle(
+                      fontSize: 40,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                  for (var item in data[parcours]!.entries)
+                    Text("${item.key} : ${item.value}"),
+                  ],
+                ),
+            ],
           ),
-          Text(
-            test.value,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

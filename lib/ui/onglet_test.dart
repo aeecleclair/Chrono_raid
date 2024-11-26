@@ -1,10 +1,4 @@
-import 'dart:convert';
-
-import 'package:chrono_raid/ui/equipes.dart';
-import 'package:chrono_raid/ui/functions.dart';
-import 'package:chrono_raid/ui/temps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import 'database.dart';
@@ -18,7 +12,7 @@ class OngletTest extends HookWidget {
     final dbm = DatabaseManager();
 
     void envoyer() async {
-      // await dbm.createTableEquipes();
+      await dbm.createTableEquipes();
       // String txt = '';
       // final List<Temps> liste = (await dbm.getTemps()).toList();
       // for (int i=0; i < liste.length; i++) {
@@ -27,7 +21,8 @@ class OngletTest extends HookWidget {
       // test.value = txt;
       //final a = (await dbm.getParcoursByDossard(1));
       //print(a);
-      final tamere = await readJsonEquipes();
+      final tamere = await dbm.getTemps();
+      print(tamere.map((e) => e.toString() + '\n').toList());
       test.value = tamere.toString();
 
     }

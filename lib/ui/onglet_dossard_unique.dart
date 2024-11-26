@@ -1,4 +1,5 @@
 import 'package:chrono_raid/ui/database.dart';
+import 'package:chrono_raid/ui/popup_edit_temps.dart';
 import 'package:chrono_raid/ui/temps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,18 +21,52 @@ class OngletDossardUnique extends HookWidget {
       dossard.value = dossard_str;
       if (dossard_str != '' && await dbm.valideDossard(dossard_str)) {
         _controllerDossard.clear();
-        dbm.createTemps(Temps(int.parse(dossard_str), DateTime.now().toIso8601String(), await dbm.getParcoursByDossard(dossard_str)));
-        toastification.show(
-          context: context,
-          title: const Text('Temps ajouté !'),
-          autoCloseDuration: const Duration(seconds: 3),
-          primaryColor: Colors.black,
-          backgroundColor: Colors.green,
-          foregroundColor: Colors.black,
-          icon: const Icon(Icons.check_circle_outlined),
-          closeOnClick: true,
-          alignment: Alignment.bottomRight,
-        );
+        final String now = DateTime.now().toIso8601String();
+        final result = await dbm.createTemps(Temps(int.parse(dossard_str), now, await dbm.getParcoursByDossard(dossard_str)));
+        if (result.toString() == 'error') {
+          toastification.show(
+            context: context,
+            title: Container(
+              width: 300,
+              height: 90,
+              padding: EdgeInsets.all(16),
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Ligne du dossard pleine',),
+                  Text('Temps non ajouté',),
+                  Text('Cliquer pour résoudre',),
+                ],
+              ),
+            ),
+            primaryColor: Colors.black,
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.black,
+            icon: const Icon(Icons.cancel_outlined),
+            closeOnClick: true,
+            alignment: Alignment.bottomRight,
+            callbacks: ToastificationCallbacks(
+              onTap: (toastItem) {
+                showDialog(context: context, barrierDismissible: false, builder: (BuildContext context) {return PopupEditTemps(dossard: dossard_str, date: now);});
+              },
+            ),
+            showProgressBar: false,
+          );
+        }
+        else {
+          toastification.show(
+            context: context,
+            title: const Text('Temps ajouté !'),
+            autoCloseDuration: const Duration(seconds: 3),
+            primaryColor: Colors.black,
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.black,
+            icon: const Icon(Icons.check_circle_outlined),
+            closeOnClick: true,
+            alignment: Alignment.bottomRight,
+          );
+        }
       }
       else {
         toastification.show(
