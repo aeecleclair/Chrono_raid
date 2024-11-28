@@ -74,6 +74,12 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "flutter_datetime_picker_plus",
+      "rootUri": "file:///home/clement/.pub-cache/hosted/pub.dev/flutter_datetime_picker_plus-2.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "flutter_hooks",
       "rootUri": "file:///home/clement/.pub-cache/hosted/pub.dev/flutter_hooks-0.20.5",
       "packageUri": "lib/",
@@ -100,6 +106,12 @@
     {
       "name": "iconsax_flutter",
       "rootUri": "file:///home/clement/.pub-cache/hosted/pub.dev/iconsax_flutter-1.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "intl",
+      "rootUri": "file:///home/clement/.pub-cache/hosted/pub.dev/intl-0.19.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -368,7 +380,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-11-19T22:17:29.300976Z",
+  "generated": "2024-11-28T11:36:54.827381Z",
   "generator": "pub",
   "generatorVersion": "3.5.4",
   "flutterRoot": "file:///home/clement/Documents/flutter",
