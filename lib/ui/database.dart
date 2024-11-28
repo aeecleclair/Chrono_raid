@@ -181,6 +181,26 @@ Future<Map<String, int>> countEquipes() async {
     return r;
   }
 
+  Future<Map<String, Map<int, List<String>>>> getTempsOrderedbyDossard() async {
+    final db = await instance.database;
+    final result = await db.rawQuery('''
+      SELECT ${TempsField.parcours}, ${TempsField.dossard}, ${TempsField.date}
+      FROM $tableTemps
+      ORDER BY ${TempsField.parcours} ASC, ${TempsField.dossard} ASC, ${TempsField.date} ASC
+    ''');
+    final Map<String, Map<int, List<String>>> data = {};
+
+    for (var row in result) {
+      final String parcours = row[TempsField.parcours] as String;
+      final int dossard = row[TempsField.dossard] as int;
+      final String date = row[TempsField.date] as String;
+      data.putIfAbsent(parcours, () => {});
+      data[parcours]!.putIfAbsent(dossard, () => []);
+      data[parcours]![dossard]!.add(date);
+    }
+    return data;
+  }
+
   Future<Map<String,Map<String,int>>> compteTemps() async {
     final epreuves = await readJsonEpreuves();
     final c = await countEquipes();
@@ -188,14 +208,14 @@ Future<Map<String, int>> countEquipes() async {
     final db = await instance.database;
 
     final result = await db.rawQuery('''
-      SELECT parcours, time_count, COUNT(*) as dossard_count
+      SELECT ${TempsField.parcours}, time_count, COUNT(*) as dossard_count
       FROM (
-        SELECT parcours, dossard, COUNT(*) as time_count
+        SELECT ${TempsField.parcours}, ${TempsField.dossard}, COUNT(*) as time_count
         FROM $tableTemps
-        GROUP BY parcours, dossard
+        GROUP BY ${TempsField.parcours}, ${TempsField.dossard}
       ) AS counts
-      GROUP BY parcours, time_count
-      ORDER BY parcours ASC, time_count ASC
+      GROUP BY ${TempsField.parcours}, time_count
+      ORDER BY ${TempsField.parcours} ASC, time_count ASC
     ''');
 
     final counts = result.map((row) => {

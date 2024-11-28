@@ -1,5 +1,6 @@
 import 'package:chrono_raid/ui/functions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:toastification/toastification.dart';
 import 'database.dart';
@@ -28,14 +29,15 @@ class PopupEditTemps extends StatelessWidget {
           return Center(child: Text('Erreur: ${snapshot.error}'));
         }
         final data = snapshot.data as List;
+        print(data);
         final String parcours = data[0];
         final List<Temps> temps = data[1];
         final List<String> epreuves = data[2][parcours];
       
 
         return AlertDialog(
-          scrollable: false,
-          title: const Text("Résoudre"),
+          scrollable: true,
+          title: Text(["Résoudre : dossard ", dossard].join('')),
           content: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -91,8 +93,42 @@ class PopupEditTemps extends StatelessWidget {
                       ),
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: Text(DateFormat('dd/MM - H:m:s').format(DateTime.parse(date))),
-                  ),
+                    child: () {
+                      if (date.isNotEmpty) {
+                        return Text(DateFormat('dd/MM - H:m:s').format(DateTime.parse(date)));
+                      } else {
+                        return TextButton(
+                          onPressed: () {
+                            showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2101),
+                            ).then((selectedDate) {
+                              if (selectedDate != null) {
+                                showTimePicker(
+                                  context: context,
+                                  initialTime: TimeOfDay.now(),
+                                ).then((selectedTime) {
+                                  if (selectedTime != null) {
+                                    DateTime selectedDateTime = DateTime(
+                                      selectedDate.year,
+                                      selectedDate.month,
+                                      selectedDate.day,
+                                      selectedTime.hour,
+                                      selectedTime.minute,
+                                    );
+                                    print(selectedDateTime);
+                                  }
+                                });
+                              }
+                            });
+                          },
+                          child: Text('Choisir')
+                        );
+                                }
+                  }()),
+                  
 
                 ],
               )

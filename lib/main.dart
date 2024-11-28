@@ -1,11 +1,14 @@
-import 'package:chrono_raid/ui/onglet_compte.dart';
-import 'package:chrono_raid/ui/onglet_test.dart';
-import 'package:chrono_raid/ui/onglet_dossard_groupe.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'ui/onglet_dossard_unique.dart';
+import 'ui/onglet_dossard_groupe.dart';
+import 'ui/onglet_compte.dart';
+import 'ui/onglet_edit_temps.dart';
+import 'ui/onglet_test.dart';
 
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
 Future main() async {
 
   // Initialize FFI
@@ -43,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: DefaultTabController(
-        length: 4,
+        length: 5,
         child: Scaffold(
         appBar: AppBar(
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -53,20 +56,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 Tab(icon: Icon(Icons.person)),
                 Tab(icon: Icon(Icons.group)),
                 Tab(icon: Icon(Icons.supervisor_account_outlined)),
+                Tab(icon: Icon(Icons.edit)),
                 Tab(icon: Icon(Icons.speaker_notes)),
               ],
             ),
           ),
           body: TabBarView(
             children: [
-              // Onglet dossard unique
+              // Onglet départ dossard unique
               OngletDossardUnique(),
 
-              // Onglet dossard groupe
+              // Onglet départ dossard groupe
               OngletDossardGroupe(),
 
-              // Onglet compte
+              // Onglet compte dossard
               OngletCompte(),
+
+              // Onglet consulte et edit temps
+              OngletEditTemps(),
               
               // Onglet test
               OngletTest(),

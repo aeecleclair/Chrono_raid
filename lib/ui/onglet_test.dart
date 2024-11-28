@@ -21,9 +21,10 @@ class OngletTest extends HookWidget {
       // test.value = txt;
       //final a = (await dbm.getParcoursByDossard(1));
       //print(a);
-      final tamere = await dbm.getTemps();
-      print(tamere.map((e) => e.toString() + '\n').toList());
-      test.value = tamere.toString();
+      final tamere = await dbm.getTempsOrderedbyDossard();
+      // print(tamere.map((e) => e.toString() + '\n').toList());
+      print(tamere);
+      // test.value = tamere.toString();
 
     }
 
