@@ -1,6 +1,7 @@
 import 'package:chrono_raid/ui/database.dart';
 import 'package:chrono_raid/ui/popup_edit_temps.dart';
 import 'package:chrono_raid/ui/temps.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -14,6 +15,8 @@ class OngletDossardUnique extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final dossard = useState('');
+    final _focusNode = useFocusNode();
+    final _focusNode2 = useFocusNode();
     final dbm = DatabaseManager();
     
     void envoyer() async {
@@ -23,7 +26,7 @@ class OngletDossardUnique extends HookWidget {
         _controllerDossard.clear();
         final String now = DateTime.now().toIso8601String();
         final result = await dbm.createTemps(Temps(int.parse(dossard_str), now, await dbm.getParcoursByDossard(dossard_str)));
-        if (result.toString() == 'error') {
+        if (result.toString() == 'Erreur') {
           toastification.show(
             context: context,
             title: Container(
@@ -83,33 +86,47 @@ class OngletDossardUnique extends HookWidget {
       }
     }
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            dossard.value,
-          ),
-          Container(
-            width: 160,
-            margin: const EdgeInsets.all(10.0),
-            child: TextField(
-              keyboardType: TextInputType.number,
-              controller: _controllerDossard,
-              decoration: const InputDecoration(
-                labelText: 'Dossard',
-              ),
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly
+    return Scaffold(
+      body: Focus(
+        focusNode: _focusNode,
+        autofocus: true,
+        child: KeyboardListener(
+          focusNode: _focusNode2,
+          onKeyEvent: (KeyEvent event) {
+            if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
+              envoyer();
+            }
+          },
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  dossard.value,
+                ),
+                Container(
+                  width: 160,
+                  margin: const EdgeInsets.all(10.0),
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    controller: _controllerDossard,
+                    decoration: const InputDecoration(
+                      labelText: 'Dossard',
+                    ),
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                  ),
+                ),
+                FloatingActionButton(
+                  onPressed: envoyer,
+                  child: const Text('Envoyer'),
+                ),
               ],
             ),
           ),
-          FloatingActionButton(
-            onPressed: envoyer,
-            child: const Text('Envoyer'),
-          ),
-        ],
-      ),
+        )
+      )
     );
   }
 }

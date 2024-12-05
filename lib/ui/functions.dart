@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 Future<List<Map<String,String>>> readJsonEquipes() async {
   final String response = await rootBundle.loadString('assets/Equipes.json');
@@ -24,4 +25,13 @@ Future<Map<String, List<String>>> readJsonEpreuves() async {
     ),
   );
   return data2;
+}
+
+String dateToFormat(String date) {
+  if (date == '-') {
+    return '-';
+  }
+  else {
+    return DateFormat('dd/MM - H:m:s').format(DateTime.parse(date));
+  }
 }

@@ -1,3 +1,4 @@
+import 'package:chrono_raid/ui/onglet_edit_action.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,7 +6,7 @@ import 'ui/onglet_dossard_unique.dart';
 import 'ui/onglet_dossard_groupe.dart';
 import 'ui/onglet_compte.dart';
 import 'ui/onglet_edit_temps.dart';
-import 'ui/onglet_test.dart';
+import 'ui/onglet_remarque.dart';
 
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -46,18 +47,37 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: DefaultTabController(
-        length: 5,
+        length: 6,
         child: Scaffold(
         appBar: AppBar(
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
             title: Text(widget.title),
             bottom: const TabBar(
               tabs: [
-                Tab(icon: Icon(Icons.person)),
-                Tab(icon: Icon(Icons.group)),
-                Tab(icon: Icon(Icons.supervisor_account_outlined)),
-                Tab(icon: Icon(Icons.edit)),
-                Tab(icon: Icon(Icons.speaker_notes)),
+                Tab(
+                  icon: Icon(Icons.person),
+                  child: Text('Départ simple')
+                ),
+                Tab(
+                  icon: Icon(Icons.group),
+                  child: Text('Départ groupé'),
+                ),
+                Tab(
+                  icon: Icon(Icons.supervisor_account_outlined),
+                  child: Text('Compte'),
+                ),
+                Tab(
+                  icon: Icon(Icons.edit),
+                  child: Text('Temps')
+                ),
+                Tab(
+                  icon: Icon(Icons.edit),
+                  child: Text('Actions')
+                ),
+                Tab(
+                  icon: Icon(Icons.speaker_notes),
+                  child: Text('Remarques/tests'),
+                ),
               ],
             ),
           ),
@@ -75,8 +95,11 @@ class _MyHomePageState extends State<MyHomePage> {
               // Onglet consulte et edit temps
               OngletEditTemps(),
               
-              // Onglet test
-              OngletTest(),
+              // Onglet consulte et edit actions
+              OngletEditAction(),
+
+              // Onglet remarque
+              OngletRemarque(),
             ],
           ),
         ),

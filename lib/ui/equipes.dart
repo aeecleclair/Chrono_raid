@@ -1,4 +1,3 @@
-
 const String tableEquipes = "equipes";
 
 class EquipesField {

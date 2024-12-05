@@ -1,3 +1,4 @@
+import 'package:chrono_raid/ui/popup_compte_dossard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -36,7 +37,16 @@ class OngletCompte extends HookWidget {
                     ),
                   ),
                   for (var item in data[parcours]!.entries)
-                    Text("${item.key} : ${item.value}"),
+                    TextButton(
+                      onPressed: () => showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (BuildContext context) {
+                          return PopupCompteDossard(epreuve: item.key, parcours: parcours);
+                        },
+                      ),
+                      child: Text("${item.key} : ${item.value}"),
+                    ),
                   ],
                 ),
             ],

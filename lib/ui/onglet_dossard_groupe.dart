@@ -1,11 +1,9 @@
 import 'package:chrono_raid/ui/database.dart';
-import 'package:chrono_raid/ui/equipes.dart';
-import 'package:chrono_raid/ui/temps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:toastification/toastification.dart';
 
-// ignore: must_be_immutable
+
 class OngletDossardGroupe extends HookWidget {
   OngletDossardGroupe({super.key,}); 
 
@@ -20,11 +18,32 @@ class OngletDossardGroupe extends HookWidget {
     final dbm = DatabaseManager();
 
     void envoyer() async {
-      List<Equipes> equipes = await dbm.getEquipes(parcours.value);
-      List<int> dossards = equipes.map((x) => x.dossard).toList();
       String date = DateTime.now().toIso8601String();
-      for (int i=0; i<dossards.length; i++) {
-        dbm.createTemps(Temps(dossards[i], date, parcours.value));
+      final result = (await dbm.createTempsGroupe(parcours.value, date)).toString();
+      if (result.isEmpty) {
+        toastification.show(
+          context: context,
+          title: const Text('Temps ajoutés !'),
+          autoCloseDuration: const Duration(seconds: 3),
+          primaryColor: Colors.black,
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.black,
+          icon: const Icon(Icons.check_circle_outlined),
+          closeOnClick: true,
+          alignment: Alignment.bottomRight,
+        );
+      } else {
+        toastification.show(
+          context: context,
+          title: Text(result),
+          autoCloseDuration: const Duration(seconds: 3),
+          primaryColor: Colors.black,
+          backgroundColor: Colors.red,
+          foregroundColor: Colors.black,
+          icon: const Icon(Icons.cancel_outlined),
+          closeOnClick: true,
+          alignment: Alignment.bottomRight,
+        );
       }
     }
 
