@@ -42,6 +42,7 @@ class DatabaseManager {
     final path = join(dbPath, filePath);
     // await deleteDatabase(path);
     // print('db supprimée');
+
     // On ouvre la basse de donnée
     return await openDatabase(path, version: 1, onCreate: _createDB);
   }
@@ -63,6 +64,12 @@ class DatabaseManager {
         ${EquipesField.parcours} $stringType
     );
     ''');
+    final value = await readJsonEquipes();
+    final List<Map<String,String>> equipes = value;
+    for (int i=0; i<equipes.length; i++) {
+      final Map<String,String> json = equipes[i];
+      await db.insert(tableEquipes, json); 
+    }
 
     await db.execute('''
     CREATE TABLE IF NOT EXISTS $tableTemps (
@@ -85,17 +92,14 @@ class DatabaseManager {
         ${ActionField.nouveau_temps} $stringType
     );
     ''');
-  }
 
-  Future createTableEquipes() async {
-    final db = await instance.database;
-    await db.delete(tableEquipes);
-    final value = await readJsonEquipes();
-    final List<Map<String,String>> equipes = value;
-    for (int i=0; i<equipes.length; i++) {
-      final Map<String,String> json = equipes[i];
-      await db.insert(tableEquipes, json); 
-    }
+    await db.execute('''
+    CREATE TABLE IF NOT EXISTS $tableRemarque (
+        ${RemarqueField.id} $stringType,
+        ${RemarqueField.date} $stringType,
+        ${RemarqueField.texte} $stringType
+    );
+    ''');
   }
 
   Future<String> getParcoursByDossard(String dossard) async{
@@ -217,10 +221,6 @@ Future<Map<String, int>> countEquipes() async {
   }
   
   Future test() async {
-    final db = await instance.database;
-    await db.execute('''
-      DELETE FROM $tableAction
-    ''');
   }
 
   Future deleteTemps(Temps t) async {
@@ -397,5 +397,13 @@ Future<Map<String, int>> countEquipes() async {
     final db = await instance.database;
     final json = r.toJson();
     await db.insert(tableRemarque, json);
+    print(r.texte);
+  }
+  
+  Future<List<Remarque>> getRemarque() async {
+    final db = await instance.database;
+    final result = await db.query(tableRemarque);
+    List<Remarque> r = result.map((e) => Remarque.fromJson(e)).toList();
+    return r;
   }
 }

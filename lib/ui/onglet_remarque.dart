@@ -15,7 +15,6 @@ class OngletRemarque extends HookWidget {
     final dbm = DatabaseManager();
 
     void button_test() async {
-      await dbm.createTableEquipes();
       await dbm.test();
       print("table equipes créée");
       // String txt = '';
@@ -26,7 +25,7 @@ class OngletRemarque extends HookWidget {
       // test.value = txt;
       //final a = (await dbm.getParcoursByDossard(1));
       //print(a);
-      final tamere = await dbm.getAction();
+      final tamere = await dbm.getRemarque();
       print(tamere.map((e) => e.toString() + '\n').toList());
       // print(tamere);
       // test.value = tamere.toString();
@@ -37,7 +36,7 @@ class OngletRemarque extends HookWidget {
       final dbm = DatabaseManager();
       String remarque_text = _controllerRemarque.text;
       await dbm.createRemarque(Remarque(DateTime.now().toIso8601String(), remarque_text));
-
+      _controllerRemarque.clear();
     }
 
     return Center(
