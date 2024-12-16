@@ -186,7 +186,7 @@ Future<Map<String, int>> countEquipes() async {
       final nb_temps = (await db.rawQuery('''
         SELECT COUNT(*) as c
         FROM $tableTemps
-        WHERE dossard = ${d}
+        WHERE dossard = $d
       '''))[0]['c'] as int;
       if (nb_temps_ref == -1) {
         nb_temps_ref = nb_temps;
@@ -218,9 +218,6 @@ Future<Map<String, int>> countEquipes() async {
       SET ${TempsField.date} = '$date'
       WHERE ${TempsField.id} = '${t.id}'
     ''');
-  }
-  
-  Future test() async {
   }
 
   Future deleteTemps(Temps t) async {

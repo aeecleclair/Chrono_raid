@@ -5,7 +5,7 @@ class PopupCompteDossard extends StatelessWidget {
   final String epreuve;
   final String parcours;
 
-  PopupCompteDossard({super.key, required this.epreuve, required this.parcours});
+  const PopupCompteDossard({super.key, required this.epreuve, required this.parcours});
 
   @override
   Widget build(BuildContext context) {

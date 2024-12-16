@@ -18,6 +18,7 @@ class OngletDossardUnique extends HookWidget {
     final _focusNode = useFocusNode();
     final _focusNode2 = useFocusNode();
     final dbm = DatabaseManager();
+    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
     
     void envoyer() async {
       String dossard_str = _controllerDossard.text;
@@ -48,7 +49,7 @@ class OngletDossardUnique extends HookWidget {
             foregroundColor: Colors.black,
             icon: const Icon(Icons.cancel_outlined),
             closeOnClick: true,
-            alignment: Alignment.bottomRight,
+            alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
             callbacks: ToastificationCallbacks(
               onTap: (toastItem) {
                 showDialog(context: context, barrierDismissible: false, builder: (BuildContext context) {return PopupEditTemps(dossard: dossard_str, date: now);});
@@ -67,7 +68,7 @@ class OngletDossardUnique extends HookWidget {
             foregroundColor: Colors.black,
             icon: const Icon(Icons.check_circle_outlined),
             closeOnClick: true,
-            alignment: Alignment.bottomRight,
+            alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
           );
         }
       }
@@ -81,7 +82,7 @@ class OngletDossardUnique extends HookWidget {
           foregroundColor: Colors.black,
           icon: const Icon(Icons.cancel_outlined),
           closeOnClick: true,
-          alignment: Alignment.bottomRight,
+          alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
         );
       }
     }
@@ -97,33 +98,31 @@ class OngletDossardUnique extends HookWidget {
               envoyer();
             }
           },
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  dossard.value,
-                ),
-                Container(
-                  width: 160,
-                  margin: const EdgeInsets.all(10.0),
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    controller: _controllerDossard,
-                    decoration: const InputDecoration(
-                      labelText: 'Dossard',
-                    ),
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                dossard.value,
+              ),
+              Container(
+                margin: const EdgeInsets.all(10.0),
+                child: TextField(
+                  keyboardType: TextInputType.number,
+                  controller: _controllerDossard,
+                  decoration: const InputDecoration(
+                    labelText: 'Dossard',
                   ),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
                 ),
-                FloatingActionButton(
-                  onPressed: envoyer,
-                  child: const Text('Envoyer'),
-                ),
-              ],
-            ),
+              ),
+              FloatingActionButton(
+                onPressed: envoyer,
+                child: const Text('Envoyer'),
+              ),
+            ],
           ),
         )
       )

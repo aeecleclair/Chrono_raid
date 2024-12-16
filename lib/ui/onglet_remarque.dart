@@ -11,26 +11,6 @@ class OngletRemarque extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final test = useState('');
-    final dbm = DatabaseManager();
-
-    void button_test() async {
-      await dbm.test();
-      print("table equipes créée");
-      // String txt = '';
-      // final List<Temps> liste = (await dbm.getTemps()).toList();
-      // for (int i=0; i < liste.length; i++) {
-      //   txt += liste[i].dossard.toString() + ' ' + liste[i].parcours.toString() + ' ' + liste[i].date.toString() + '\n';
-      // }
-      // test.value = txt;
-      //final a = (await dbm.getParcoursByDossard(1));
-      //print(a);
-      final tamere = await dbm.getRemarque();
-      print(tamere.map((e) => e.toString() + '\n').toList());
-      // print(tamere);
-      // test.value = tamere.toString();
-
-    }
 
     void envoyer() async {
       final dbm = DatabaseManager();
@@ -44,19 +24,22 @@ class OngletRemarque extends HookWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Container(
-            width: 600,
-            height: 300,
-            child: TextField(
-              controller: _controllerRemarque,
-              maxLines: 20,
-              minLines: 10,
-              style: TextStyle(
-                color: Colors.black,
-              ),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black),
-                  borderRadius: BorderRadius.circular(10),
+            margin: EdgeInsets.all(24),
+            child: SizedBox(
+              width: 600,
+              height: 300,
+              child: TextField(
+                controller: _controllerRemarque,
+                maxLines: 20,
+                minLines: 10,
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
             ),
@@ -64,13 +47,6 @@ class OngletRemarque extends HookWidget {
           FloatingActionButton(
             onPressed: envoyer,
             child: const Text('Envoyer'),
-          ),
-          FloatingActionButton(
-            onPressed: button_test,
-            child: const Text('Test'),
-          ),
-          Text(
-            test.value,
           ),
         ],
       ),

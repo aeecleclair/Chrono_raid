@@ -1,4 +1,5 @@
 import 'package:chrono_raid/ui/functions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -9,6 +10,7 @@ class OngletEditAction extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
     final dbm = DatabaseManager();
     final refresh = useState(false);
 
@@ -76,7 +78,7 @@ class OngletEditAction extends HookWidget {
                 child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 6,
-                    childAspectRatio: 8,
+                    childAspectRatio: isMobile ? 1 : 8,
                   ),
                   itemCount: data.isNotEmpty? 6 + (data.length * 6) : 6,
                   itemBuilder: (context, index) {
@@ -103,10 +105,15 @@ class OngletEditAction extends HookWidget {
                         dateToFormat(action.nouveau_temps)
                       ][colIndex];
                 
-                      return Center(
-                        child: Text(
-                          cellData,
-                          textAlign: TextAlign.center,
+                      return Container(
+                        decoration: BoxDecoration(
+                          border: Border(top: BorderSide(color: Colors.black, width: 0.5)),
+                        ),
+                        child: Center(
+                          child: Text(
+                            cellData,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       );
                     }

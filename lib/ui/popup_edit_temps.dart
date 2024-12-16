@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:chrono_raid/ui/functions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:toastification/toastification.dart';
@@ -33,6 +36,8 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
   @override
   Widget build(BuildContext context) {
     final dbm = DatabaseManager();
+  final scrollController = ScrollController();
+    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
 
     return FutureBuilder<List<Object>>(
       future: Future.wait([
@@ -80,7 +85,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                     ),
                     child: () {
                       if (widget.date.isNotEmpty) {
-                        return Text(DateFormat('dd/MM - H:m:s').format(DateTime.parse(widget.date)));
+                        return Text(dateToFormat(widget.date));
                       } else {
                         return TextButton(
                           onPressed: () {
@@ -116,104 +121,120 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                         );
                                 }
                   }()),
-                  
-
                 ],
               ),
-              SizedBox(height: 40,),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  for (int i = 0; i < epreuves.length; i++)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      child: Wrap(
-                        direction: Axis.vertical, 
-                        spacing: 20,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Text(epreuves[i]),
-                          Container(child: () {
-                            if (i < temps.length) {
-                              return Text(dateToFormat(temps[i].date));
-                            } else {
-                              return Text('-');
-                            }
-                          }()),
-                          Container(child: () {
-                            if (i < temps.length) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  ElevatedButton(
-                                    child: const Text("Remplacer"),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      widget.refresher.value = !widget.refresher.value;
-                                      if (widget.date.isNotEmpty) {
-                                        dbm.editTemps(temps[i], widget.date);
-                                      } else {
-                                        dbm.editTemps(temps[i], _selectedDate);
-                                      }
-                                      toastification.show(
-                                        context: context,
-                                        title: const Text('Temps modifié !'),
-                                        autoCloseDuration: const Duration(seconds: 3),
-                                        primaryColor: Colors.black,
-                                        backgroundColor: Colors.green,
-                                        foregroundColor: Colors.black,
-                                        icon: const Icon(Icons.check_circle_outlined),
-                                        closeOnClick: true,
-                                        alignment: Alignment.bottomRight,
-                                      );
-                                    },
-                                  ),
-                                  if (widget.date.isEmpty)
-                                    SizedBox(height: 20,),
-                                    ElevatedButton(
-                                      child: const Text("Supprimer"),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        widget.refresher.value = !widget.refresher.value;
-                                        dbm.deleteTemps(temps[i]);
-                                        toastification.show(
-                                          context: context,
-                                          title: const Text('Temps supprimé !'),
-                                          autoCloseDuration: const Duration(seconds: 3),
-                                          primaryColor: Colors.black,
-                                          backgroundColor: Colors.green,
-                                          foregroundColor: Colors.black,
-                                          icon: const Icon(Icons.check_circle_outlined),
-                                          closeOnClick: true,
-                                          alignment: Alignment.bottomRight,
-                                        );
-                                      },
-                                    ),
-                                ],
-                              );
-                            } else {
-                              return Column(
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: null,
-                                    child: const Text("Remplacer"),
-                                  ),
-                                  if (widget.date.isEmpty)
-                                    SizedBox(height: 20,),
-                                    ElevatedButton(
-                                      onPressed: null,
-                                      child: const Text("Supprimer"),
-                                    ),
-                                ],
-                              );
-                            }
-                          }()),
 
-                        ]
+              SizedBox(height: 40,),
+              Scrollbar(
+                controller: scrollController,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(
+                    width: max(((epreuves.length) * 125).toDouble(), MediaQuery.of(context).size.width),
+                    height: 250,
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: epreuves.length,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        childAspectRatio: 3.5,
                       ),
-                    ),
-                ],
+                      itemCount: epreuves.length*4,
+                      itemBuilder: (context, index) {
+                        final rowIndex = index ~/ epreuves.length;
+                        final colIndex = index % epreuves.length;
+                        print(rowIndex);
+                        if (rowIndex == 0) {
+                          return Text(epreuves[index], textAlign: TextAlign.center,);
+                        } else if (rowIndex == 1){
+                          if (colIndex < temps.length) {
+                            return Text(dateToFormat(temps[colIndex].date), textAlign: TextAlign.center,);
+                          } else {
+                            return Text('-', textAlign: TextAlign.center,);
+                          }
+                        } else if (rowIndex == 2) {
+                          if (colIndex < temps.length) {
+                            return ElevatedButton(
+                              child: const Text("Remplacer"),
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                                if (widget.date.isNotEmpty) {
+                                  await dbm.editTemps(temps[colIndex], widget.date);
+                                } else {
+                                  await dbm.editTemps(temps[colIndex], _selectedDate);
+                                }
+                                toastification.show(
+                                  context: context,
+                                  title: const Text('Temps modifié !'),
+                                  autoCloseDuration: const Duration(seconds: 3),
+                                  primaryColor: Colors.black,
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.black,
+                                  icon: const Icon(Icons.check_circle_outlined),
+                                  closeOnClick: true,
+                                  alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+                                );
+                                widget.refresher.value = !widget.refresher.value;
+                              },
+                            );
+                          } else if (colIndex == temps.length && widget.date.isEmpty) {
+                            return ElevatedButton(
+                              child: const Text("Ajouter"),
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                                await dbm.createTemps(Temps(int.parse(widget.dossard), _selectedDate, parcours));
+                                toastification.show(
+                                  context: context,
+                                  title: const Text('Temps ajouté !'),
+                                  autoCloseDuration: const Duration(seconds: 3),
+                                  primaryColor: Colors.black,
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.black,
+                                  icon: const Icon(Icons.check_circle_outlined),
+                                  closeOnClick: true,
+                                  alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+                                );
+                                widget.refresher.value = !widget.refresher.value;
+                              },
+                            );
+                          } else {
+                            return Container();
+                          }
+                        } else if (rowIndex == 3) {
+                          if (widget.date.isEmpty && colIndex < temps.length) {
+                            return ElevatedButton(
+                              child: const Text("Supprimer"),
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                                await dbm.deleteTemps(temps[colIndex]);
+                                toastification.show(
+                                  context: context,
+                                  title: const Text('Temps supprimé !'),
+                                  autoCloseDuration: const Duration(seconds: 3),
+                                  primaryColor: Colors.black,
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.black,
+                                  icon: const Icon(Icons.check_circle_outlined),
+                                  closeOnClick: true,
+                                  alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+                                );
+                                widget.refresher.value = !widget.refresher.value;
+                              },
+                            );
+                          } else {
+                            return Container();
+                          }
+                        } else {
+                          return Container();
+                        }
+                      }
+                    )
+                  ),
+                ),
               ),
             ],
           ),

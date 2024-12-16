@@ -32,7 +32,7 @@ class OngletCompte extends HookWidget {
                   children: <Widget>[
                   Text(parcours,
                     style: TextStyle(
-                      fontSize: 40,
+                      fontSize: 30,
                       decoration: TextDecoration.underline,
                     ),
                   ),
