@@ -1,9 +1,10 @@
 import 'dart:io';
 
+import 'package:chrono_raid/ui/OngletCO.dart';
+import 'package:chrono_raid/ui/functions.dart';
 import 'package:chrono_raid/ui/onglet_edit_action.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
 import 'ui/onglet_dossard_unique.dart';
 import 'ui/onglet_dossard_groupe.dart';
@@ -28,45 +29,118 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Chrono raid',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Chrono raid'),
+      home: HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
 
+class HomePage extends StatelessWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<String>>(
+      future: getRavitos(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Erreur: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('Aucune donnée disponible'));
+        }
+        final data = snapshot.data!;
+        data.add('Admin');
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Page d\'Accueil'),
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                for (var r in data)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MainPage(r)),
+                      );
+                    },
+                    child: Text(r),
+                  ),
+              ]
+            ),
+          ),
+        );
+      } 
+    );
+  }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class MainPage extends StatefulWidget {
+  final String ravito;
+  const MainPage(this.ravito, {super.key});
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
 
-    return MaterialApp(
-      home: DefaultTabController(
-        length: isMobile? 5 : 6,
-        child: Scaffold(
-          appBar: isMobile ? null : AppBar(
-            title: null,
-            bottom: buildTabs(isMobile),
+    return FutureBuilder(
+      future: isCO(widget.ravito),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Erreur: ${snapshot.error}'));
+        }
+        final CO = snapshot.data!;
+        return MaterialApp(
+          home: DefaultTabController(
+            length: (isMobile? 5 : 6) + (CO? 1 : 0),
+            child: Scaffold(
+              appBar: AppBar(
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        }, 
+                        icon:const Icon(Icons.arrow_back)
+                      ),
+                      Text(widget.ravito),
+                      Container(),
+                    ],
+                  ),
+              ),
+              body: Scaffold(
+                appBar: isMobile ? null : AppBar(
+                  title: null,
+                  bottom: buildTabs(isMobile, CO),
+                ),
+                body: buildTabsContent(isMobile, CO, widget.ravito),
+                bottomNavigationBar: isMobile ? buildTabs(isMobile, CO) : null,
+              ),
+            ),
           ),
-          body: buildTabsContent(isMobile),
-          bottomNavigationBar: isMobile ? buildTabs(isMobile) : null,
-        ),
-      ),
+        );
+      }
     );
   }
 
-  PreferredSizeWidget buildTabs(bool isMobile) {
+  PreferredSizeWidget buildTabs(bool isMobile, bool CO) {
     return TabBar(
       tabs:[
         for (final tab in [
@@ -75,6 +149,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ] else ...[
             {'icon': Icons.person, 'text': 'Départ simple'},
             {'icon': Icons.group, 'text': 'Départ groupé'},
+          ],
+          if (CO) ...[
+            {'icon': Icons.map_rounded, 'text': "Course d'orientation"},
           ],
           {'icon': Icons.supervisor_account_outlined, 'text': 'Compte'},
           {'icon': Icons.edit, 'text': 'Temps'},
@@ -101,68 +178,79 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget buildTabsContent(bool isMobile){
+  Widget buildTabsContent(bool isMobile, bool CO, String ravito) {
     if (isMobile) {
-      return  Column(
-        children: [
-          SizedBox(height: 60),
-          Expanded(
-            child: TabBarView(
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                // Onglet fusionné dossard unique et groupe
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height/3-10,
-                        width: 160,
-                        child: OngletDossardUnique(),
+      return Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Column(
+          children: [
+            Expanded(
+              child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  // Onglet fusionné dossard unique et groupe
+                  CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height/2.5,
+                          child: OngletDossardUnique(ravito),
+                        ),
                       ),
-                      Divider(thickness: 1,),
-                      OngletDossardGroupe(),
-                    ],
+                      SliverToBoxAdapter(
+                        child: Divider(thickness: 1,),
+                      ),
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: OngletDossardGroupe(ravito),
+                      ),
+                    ]
                   ),
-                ),
-
-                // Onglet compte dossard
-                OngletCompte(),
-
-                // Onglet consulte et edit temps
-                OngletEditTemps(),
-                
-                // Onglet consulte et edit actions
-                OngletEditAction(),
-
-                // Onglet remarque
-                OngletRemarque(),
-              ],
+        
+                  // Onglet CO
+                  if (CO) OngletCO(),
+        
+                  // Onglet compte dossard
+                  OngletCompte(ravito),
+        
+                  // Onglet consulte et edit temps
+                  OngletEditTemps(ravito),
+                  
+                  // Onglet consulte et edit actions
+                  OngletEditAction(ravito),
+        
+                  // Onglet remarque
+                  OngletRemarque(ravito),
+                ],
+              ),
             ),
-          ),
-          Divider(thickness: 1),
-        ]
+            Divider(thickness: 1),
+          ]
+        ),
       );
     }
-    return TabBarView(
+    return  TabBarView(
       children: [
         // Onglet départ dossard unique
-        OngletDossardUnique(),
+        OngletDossardUnique(ravito),
 
         // Onglet départ dossard groupe
-        OngletDossardGroupe(),
+        OngletDossardGroupe(ravito),
+
+        // Onglet CO
+        if (CO) OngletCO(),
 
         // Onglet compte dossard
-        OngletCompte(),
+        OngletCompte(ravito),
 
         // Onglet consulte et edit temps
-        OngletEditTemps(),
+        OngletEditTemps(ravito),
         
         // Onglet consulte et edit actions
-        OngletEditAction(),
+        OngletEditAction(ravito),
 
         // Onglet remarque
-        OngletRemarque(),
+        OngletRemarque(ravito),
       ],
     );
   }

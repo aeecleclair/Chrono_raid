@@ -6,7 +6,8 @@ import 'package:toastification/toastification.dart';
 
 
 class OngletDossardGroupe extends HookWidget {
-  OngletDossardGroupe({super.key,}); 
+  final String ravito;
+  const OngletDossardGroupe(this.ravito, {super.key,}); 
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class OngletDossardGroupe extends HookWidget {
 
     void envoyer() async {
       String date = DateTime.now().toIso8601String();
-      final result = (await dbm.createTempsGroupe(parcours.value, date)).toString();
+      final result = (await dbm.createTempsGroupe(parcours.value, date, ravito)).toString();
       if (result.isEmpty) {
         toastification.show(
           context: context,
@@ -44,24 +45,26 @@ class OngletDossardGroupe extends HookWidget {
       }
     }
 
-    return SizedBox(
-      width: 200,
+    return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           for (var p in ['Découverte', 'Sportif', 'Expert'])
-            RadioListTile(
-              title: Text(p),
-              value: p,
-              groupValue: parcours.value,
-              activeColor: Color(0xFF6200EE),
-              onChanged: (value) {
-                parcours.value = value.toString();
-              },
+            SizedBox(
+              width: 200,
+              child: RadioListTile(
+                title: Text(p),
+                value: p,
+                groupValue: parcours.value,
+                activeColor: Color(0xFF6200EE),
+                onChanged: (value) {
+                  parcours.value = value.toString();
+                },
+              ),
             ),
-    
+          
           const SizedBox(height: 20),
-    
+          
           FloatingActionButton(
             onPressed: envoyer,
             child: const Text('Envoyer'),

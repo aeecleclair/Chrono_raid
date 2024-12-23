@@ -6,7 +6,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'database.dart';
 
 class OngletRemarque extends HookWidget {
-  OngletRemarque({super.key,});
+  final String ravito;
+  OngletRemarque(this.ravito, {super.key,});
   final TextEditingController _controllerRemarque = TextEditingController();
 
   @override
@@ -15,7 +16,7 @@ class OngletRemarque extends HookWidget {
     void envoyer() async {
       final dbm = DatabaseManager();
       String remarque_text = _controllerRemarque.text;
-      await dbm.createRemarque(Remarque(DateTime.now().toIso8601String(), remarque_text));
+      await dbm.createRemarque(Remarque(DateTime.now().toIso8601String(), ravito, remarque_text));
       _controllerRemarque.clear();
     }
 

@@ -8,25 +8,26 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:toastification/toastification.dart';
 
 class OngletDossardUnique extends HookWidget {
-  OngletDossardUnique({super.key,});
+  final String ravito;
+  OngletDossardUnique(this.ravito, {super.key,});
 
-  final TextEditingController _controllerDossard = TextEditingController();
+  final TextEditingController controllerDossard = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final dossard = useState('');
-    final _focusNode = useFocusNode();
-    final _focusNode2 = useFocusNode();
+    final focusNode = useFocusNode();
+    final focusNode2 = useFocusNode();
     final dbm = DatabaseManager();
     final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
     
     void envoyer() async {
-      String dossard_str = _controllerDossard.text;
+      String dossard_str = controllerDossard.text;
       dossard.value = dossard_str;
       if (dossard_str != '' && await dbm.valideDossard(dossard_str)) {
-        _controllerDossard.clear();
+        controllerDossard.clear();
         final String now = DateTime.now().toIso8601String();
-        final result = await dbm.createTemps(Temps(int.parse(dossard_str), now, await dbm.getParcoursByDossard(dossard_str)));
+        final result = await dbm.createTemps(Temps(int.parse(dossard_str), now, await dbm.getParcoursByDossard(dossard_str), ravito));
         if (result.toString() == 'Erreur') {
           toastification.show(
             context: context,
@@ -52,7 +53,7 @@ class OngletDossardUnique extends HookWidget {
             alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
             callbacks: ToastificationCallbacks(
               onTap: (toastItem) {
-                showDialog(context: context, barrierDismissible: false, builder: (BuildContext context) {return PopupEditTemps(dossard: dossard_str, date: now);});
+                showDialog(context: context, barrierDismissible: false, builder: (BuildContext context) {return PopupEditTemps(dossard: dossard_str, ravito: ravito, date: now);});
               },
             ),
             showProgressBar: false,
@@ -87,45 +88,46 @@ class OngletDossardUnique extends HookWidget {
       }
     }
 
-    return Scaffold(
-      body: Focus(
-        focusNode: _focusNode,
+    return Focus(
+        focusNode: focusNode,
         autofocus: true,
         child: KeyboardListener(
-          focusNode: _focusNode2,
+          focusNode: focusNode2,
           onKeyEvent: (KeyEvent event) {
             if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
               envoyer();
             }
           },
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                dossard.value,
-              ),
-              Container(
-                margin: const EdgeInsets.all(10.0),
-                child: TextField(
-                  keyboardType: TextInputType.number,
-                  controller: _controllerDossard,
-                  decoration: const InputDecoration(
-                    labelText: 'Dossard',
-                  ),
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  dossard.value,
                 ),
-              ),
-              FloatingActionButton(
-                onPressed: envoyer,
-                child: const Text('Envoyer'),
-              ),
-            ],
+                Container(
+                  width: 200,
+                  margin: const EdgeInsets.all(10.0),
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    controller: controllerDossard,
+                    decoration: const InputDecoration(
+                      labelText: 'Dossard',
+                    ),
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20,),
+                FloatingActionButton(
+                  onPressed: envoyer,
+                  child: const Text('Envoyer'),
+                ),
+              ],
+            ),
           ),
         )
-      )
     );
   }
 }

@@ -11,12 +11,14 @@ import 'temps.dart';
 class PopupEditTemps extends StatefulWidget {
   final String dossard;
   final String date;
+  final String ravito;
   final refresher;
 
   const PopupEditTemps({
     super.key,
     required this.dossard,
     required this.date,
+    required this.ravito,
     this.refresher,
   });
 
@@ -36,14 +38,14 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
   @override
   Widget build(BuildContext context) {
     final dbm = DatabaseManager();
-  final scrollController = ScrollController();
+    final scrollController = ScrollController();
     final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
 
     return FutureBuilder<List<Object>>(
       future: Future.wait([
         dbm.getParcoursByDossard(widget.dossard),
-        dbm.getTempsbyDossard(widget.dossard),
-        readJsonEpreuves(),
+        dbm.getTempsbyDossard(widget.dossard, widget.ravito),
+        readJsonEpreuves(widget.ravito),
       ]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -55,7 +57,8 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
         final String parcours = data[0];
         final List<Temps> temps = data[1];
         final List<String> epreuves = data[2][parcours];
-      
+        final int nb_cols = min(temps.length + 1, epreuves.length);
+        print(nb_cols);
 
         return AlertDialog(
           scrollable: true,
@@ -132,32 +135,32 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                   controller: scrollController,
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
-                    width: max(((epreuves.length) * 125).toDouble(), MediaQuery.of(context).size.width),
+                    width: (nb_cols * 200).toDouble(),
                     height: 250,
                     child: GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: epreuves.length,
+                        crossAxisCount: nb_cols,
                         mainAxisSpacing: 10,
                         crossAxisSpacing: 10,
                         childAspectRatio: 3.5,
                       ),
-                      itemCount: epreuves.length*4,
+                      itemCount: nb_cols*4,
                       itemBuilder: (context, index) {
-                        final rowIndex = index ~/ epreuves.length;
-                        final colIndex = index % epreuves.length;
-                        print(rowIndex);
+                        final rowIndex = index ~/ nb_cols;
+                        final colIndex = index % nb_cols;
+
                         if (rowIndex == 0) {
                           return Text(epreuves[index], textAlign: TextAlign.center,);
                         } else if (rowIndex == 1){
-                          if (colIndex < temps.length) {
+                          if (colIndex < nb_cols - 1) {
                             return Text(dateToFormat(temps[colIndex].date), textAlign: TextAlign.center,);
                           } else {
                             return Text('-', textAlign: TextAlign.center,);
                           }
                         } else if (rowIndex == 2) {
-                          if (colIndex < temps.length) {
+                          if (colIndex < nb_cols - 1) {
                             return ElevatedButton(
                               child: const Text("Remplacer"),
                               onPressed: () async {
@@ -181,12 +184,12 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                                 widget.refresher.value = !widget.refresher.value;
                               },
                             );
-                          } else if (colIndex == temps.length && widget.date.isEmpty) {
+                          } else if (widget.date.isEmpty && colIndex == nb_cols - 1) {
                             return ElevatedButton(
                               child: const Text("Ajouter"),
                               onPressed: () async {
                                 Navigator.of(context).pop();
-                                await dbm.createTemps(Temps(int.parse(widget.dossard), _selectedDate, parcours));
+                                await dbm.createTemps(Temps(int.parse(widget.dossard), _selectedDate, parcours, widget.ravito));
                                 toastification.show(
                                   context: context,
                                   title: const Text('Temps ajouté !'),
@@ -205,7 +208,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                             return Container();
                           }
                         } else if (rowIndex == 3) {
-                          if (widget.date.isEmpty && colIndex < temps.length) {
+                          if (widget.date.isEmpty && colIndex < nb_cols - 1) {
                             return ElevatedButton(
                               child: const Text("Supprimer"),
                               onPressed: () async {

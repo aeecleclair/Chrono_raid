@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:core';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
@@ -15,16 +17,26 @@ Future<List<Map<String,String>>> readJsonEquipes() async {
   return data2;
 }
 
-Future<Map<String, List<String>>> readJsonEpreuves() async {
+Future<Map<String, List<String>>> readJsonEpreuves(ravito) async {
   final String response = await rootBundle.loadString('assets/Epreuves.json');
-  final Map<String, dynamic> data = json.decode(response)["Epreuves"];
-  final Map<String, List<String>> data2 = data.map(
-    (key, value) => MapEntry(
-      key,
-      List<String>.from(value),
-    ),
+  final Map<String, dynamic> data = json.decode(response)[ravito]["Epreuves"];
+  final Map<String, List<String>> data2 = Map.fromEntries(
+    data.entries
+      .where((entry) => entry.key != "CO")
+      .map(
+        (entry) => MapEntry(
+          entry.key,
+          List<String>.from(entry.value),
+        ),
+      ),
   );
   return data2;
+}
+
+Future<List<String>> getRavitos() async {
+  final String response = await rootBundle.loadString('assets/Epreuves.json');
+  final Map<String, dynamic> data = json.decode(response);
+  return List<String>.from(data.keys);
 }
 
 String dateToFormat(String date) {
@@ -32,6 +44,14 @@ String dateToFormat(String date) {
     return '-';
   }
   else {
-    return DateFormat('dd/MM - H:m:s').format(DateTime.parse(date));
+    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
+    return isMobile ? DateFormat('dd/MM\nH:m:s').format(DateTime.parse(date)) : DateFormat('dd/MM - H:m:s').format(DateTime.parse(date));
   }
+}
+
+Future<bool> isCO(ravito) async{
+  final String response = await rootBundle.loadString('assets/Epreuves.json');
+  final data = json.decode(response)[ravito]["CO"];
+  final bool value = data as bool;
+  return value;
 }

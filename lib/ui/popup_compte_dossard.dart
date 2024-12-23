@@ -4,14 +4,15 @@ import 'database.dart';
 class PopupCompteDossard extends StatelessWidget {
   final String epreuve;
   final String parcours;
+  final String ravito;
 
-  const PopupCompteDossard({super.key, required this.epreuve, required this.parcours});
+  const PopupCompteDossard({super.key, required this.epreuve, required this.parcours, required this.ravito});
 
   @override
   Widget build(BuildContext context) {
     final dbm = DatabaseManager();
     return FutureBuilder<List<int>>(
-      future: dbm.compteDossard(parcours, epreuve),
+      future: dbm.compteDossard(parcours, epreuve, ravito),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());

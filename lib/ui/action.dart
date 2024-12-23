@@ -6,6 +6,7 @@ class ActionField {
   static final List<String> values = [
     id,
     type,
+    ravito,
     date,
     temps_id,
     parcours,
@@ -17,6 +18,7 @@ class ActionField {
   // Le nom des colonnes dans la base de donnée
   static const String id = "id";
   static const String type = "type";
+  static const String ravito = "ravito";
   static const String date = "date";
   static const String temps_id = "temps_id";
   static const String parcours = "parcours";
@@ -29,6 +31,7 @@ class ActionField {
 class Action {
   String id = "";
   String type = "";
+  String ravito = "";
   String date = "";
   String temps_id = "";
   String parcours = "";
@@ -36,9 +39,10 @@ class Action {
   String ancien_temps = "";
   String nouveau_temps = "";
 
-  Action(String Type, String Date, String Temps_id, String Parcours, String Dossard, String AncienTemps, String NouveauTemps, {String Id = ""}) {
+  Action(String Type, String Ravito, String Date, String Temps_id, String Parcours, String Dossard, String AncienTemps, String NouveauTemps, {String Id = ""}) {
     id = Id.isEmpty ? Uuid().v4() : Id;
     type = Type;
+    ravito = Ravito;
     date = Date;
     temps_id = Temps_id;
     parcours = Parcours;
@@ -49,12 +53,13 @@ class Action {
   
   @override
   String toString(){
-    return "Action(id: $id, type: $type, date: $date, temps_id: $temps_id, parcours: $parcours, dossard: $dossard, temps: $ancien_temps, temps_json: $nouveau_temps)";
+    return "Action(id: $id, type: $type, ravito: $ravito, date: $date, temps_id: $temps_id, parcours: $parcours, dossard: $dossard, temps: $ancien_temps, temps_json: $nouveau_temps)";
   }
 
   static Action fromJson(Map<String, Object?> json) =>
     Action(
         json[ActionField.type] as String,
+        json[ActionField.ravito] as String,
         json[ActionField.date] as String,
         json[ActionField.temps_id] as String,
         json[ActionField.parcours] as String,
@@ -68,6 +73,7 @@ class Action {
     {
       ActionField.id: id,
       ActionField.type: type,
+      ActionField.ravito: ravito,
       ActionField.date: date,
       ActionField.temps_id: temps_id,
       ActionField.parcours:parcours,

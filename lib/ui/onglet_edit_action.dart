@@ -6,7 +6,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'database.dart';
 
 class OngletEditAction extends HookWidget {
-  OngletEditAction({super.key,});
+  final String ravito;
+  OngletEditAction(this.ravito, {super.key,});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +16,7 @@ class OngletEditAction extends HookWidget {
     final refresh = useState(false);
 
     return FutureBuilder<List<Object>>(
-      future: dbm.getAction(),
+      future: dbm.getAction(ravito),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -62,7 +63,7 @@ class OngletEditAction extends HookWidget {
                           ElevatedButton(
                             child: const Text("Confirmer"),
                             onPressed: () {
-                              dbm.annuleDerniereAction();
+                              dbm.annuleDerniereAction(ravito);
                               Navigator.of(context).pop();
                               refresh.value = !refresh.value;
                             },
