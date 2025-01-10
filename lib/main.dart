@@ -1,8 +1,9 @@
 import 'dart:io';
 
-import 'package:chrono_raid/ui/OngletCO.dart';
+import 'package:chrono_raid/ui/onglet_CO.dart';
 import 'package:chrono_raid/ui/functions.dart';
 import 'package:chrono_raid/ui/onglet_edit_action.dart';
+import 'package:chrono_raid/ui/page_admin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -56,8 +57,13 @@ class HomePage extends StatelessWidget {
         data.add('Admin');
 
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: AppBar(
-            title: Text('Page d\'Accueil'),
+            title: const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [Text('Page d\'Accueil'), Icon(Icons.sync)]
+            ),
           ),
           body: Center(
             child: Column(
@@ -96,6 +102,10 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
 
+    if (widget.ravito == 'Admin') {
+      return PageAdmin();
+    }
+
     return FutureBuilder(
       future: isCO(widget.ravito),
       builder: (context, snapshot) {
@@ -109,6 +119,7 @@ class _MainPageState extends State<MainPage> {
           home: DefaultTabController(
             length: (isMobile? 5 : 6) + (CO? 1 : 0),
             child: Scaffold(
+              resizeToAvoidBottomInset: false,
               appBar: AppBar(
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,11 +132,15 @@ class _MainPageState extends State<MainPage> {
                         icon:const Icon(Icons.arrow_back)
                       ),
                       Text(widget.ravito),
-                      Container(),
+                      IconButton(
+                        onPressed: () {}, 
+                        icon:const Icon(Icons.sync)
+                      ),
                     ],
                   ),
               ),
               body: Scaffold(
+                resizeToAvoidBottomInset: false,
                 appBar: isMobile ? null : AppBar(
                   title: null,
                   bottom: buildTabs(isMobile, CO),
@@ -180,53 +195,41 @@ class _MainPageState extends State<MainPage> {
 
   Widget buildTabsContent(bool isMobile, bool CO, String ravito) {
     if (isMobile) {
-      return Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Column(
-          children: [
-            Expanded(
-              child: TabBarView(
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  // Onglet fusionné dossard unique et groupe
-                  CustomScrollView(
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height/2.5,
-                          child: OngletDossardUnique(ravito),
-                        ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: Divider(thickness: 1,),
-                      ),
-                      SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: OngletDossardGroupe(ravito),
-                      ),
-                    ]
-                  ),
-        
-                  // Onglet CO
-                  if (CO) OngletCO(),
-        
-                  // Onglet compte dossard
-                  OngletCompte(ravito),
-        
-                  // Onglet consulte et edit temps
-                  OngletEditTemps(ravito),
-                  
-                  // Onglet consulte et edit actions
-                  OngletEditAction(ravito),
-        
-                  // Onglet remarque
-                  OngletRemarque(ravito),
-                ],
-              ),
+      return Column(
+        children: [
+          Expanded(
+            child: TabBarView(
+              physics: NeverScrollableScrollPhysics(),
+              children: [
+                // Onglet fusionné dossard unique et groupe
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    OngletDossardUnique(ravito),
+                    Divider(thickness: 1,),
+                    OngletDossardGroupe(ravito),
+                  ],
+                ),
+
+                // Onglet CO
+                if (CO) OngletCO(),
+      
+                // Onglet compte dossard
+                OngletCompte(ravito),
+      
+                // Onglet consulte et edit temps
+                OngletEditTemps(ravito),
+                
+                // Onglet consulte et edit actions
+                OngletEditAction(ravito),
+      
+                // Onglet remarque
+                OngletRemarque(ravito),
+              ],
             ),
-            Divider(thickness: 1),
-          ]
-        ),
+          ),
+          Divider(thickness: 1),
+        ]
       );
     }
     return  TabBarView(

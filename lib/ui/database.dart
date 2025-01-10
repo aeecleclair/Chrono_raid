@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:chrono_raid/ui/functions.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -369,12 +371,21 @@ class DatabaseManager {
 
   Future<Map<String, Map<int, List<String>>>> getTempsOrderedbyDossard(String ravito) async {
     final db = await instance.database;
-    final result = await db.rawQuery('''
-      SELECT ${TempsField.parcours}, ${TempsField.dossard}, ${TempsField.date}
-      FROM $tableTemps
-      WHERE ${TempsField.ravito} = '$ravito'
-      ORDER BY ${TempsField.parcours} ASC, ${TempsField.dossard} ASC, ${TempsField.date} ASC
-    ''');
+    final result;
+    if (ravito != 'admin') {
+      result = await db.rawQuery('''
+        SELECT ${TempsField.parcours}, ${TempsField.dossard}, ${TempsField.date}
+        FROM $tableTemps
+        WHERE ${TempsField.ravito} = '$ravito'
+        ORDER BY ${TempsField.parcours} ASC, ${TempsField.dossard} ASC, ${TempsField.date} ASC
+      ''');
+    } else {
+      result = await db.rawQuery('''
+        SELECT ${TempsField.parcours}, ${TempsField.dossard}, ${TempsField.date}
+        FROM $tableTemps
+        ORDER BY ${TempsField.parcours} ASC, ${TempsField.dossard} ASC, ${TempsField.date} ASC
+      ''');
+    }
     final Map<String, Map<int, List<String>>> data = {};
 
     for (var row in result) {
@@ -393,18 +404,32 @@ class DatabaseManager {
     final c = await countEquipes();
     Map<String,Map<String,int>> data = {for (var parcours in ["Expert", "Sportif", "Découverte"]) parcours : {for (var epreuve in (epreuves[parcours]!)) epreuve : (epreuve==epreuves[parcours]![0] ? c[parcours]! : 0) }};
     final db = await instance.database;
+    final result;
 
-    final result = await db.rawQuery('''
-      SELECT ${TempsField.parcours}, time_count, COUNT(*) as dossard_count
-      FROM (
-        SELECT ${TempsField.parcours}, ${TempsField.dossard}, COUNT(*) as time_count
-        FROM $tableTemps
-        WHERE ${TempsField.ravito} = '$ravito'
-        GROUP BY ${TempsField.parcours}, ${TempsField.dossard}
-      ) AS counts
-      GROUP BY ${TempsField.parcours}, time_count
-      ORDER BY ${TempsField.parcours} ASC, time_count ASC
-    ''');
+    if (ravito != 'admin') {
+      result = await db.rawQuery('''
+        SELECT ${TempsField.parcours}, time_count, COUNT(*) as dossard_count
+        FROM (
+          SELECT ${TempsField.parcours}, ${TempsField.dossard}, COUNT(*) as time_count
+          FROM $tableTemps
+          WHERE ${TempsField.ravito} = '$ravito'
+          GROUP BY ${TempsField.parcours}, ${TempsField.dossard}
+        ) AS counts
+        GROUP BY ${TempsField.parcours}, time_count
+        ORDER BY ${TempsField.parcours} ASC, time_count ASC
+      ''');
+    } else {
+      result = await db.rawQuery('''
+        SELECT ${TempsField.parcours}, time_count, COUNT(*) as dossard_count
+        FROM (
+          SELECT ${TempsField.parcours}, ${TempsField.dossard}, COUNT(*) as time_count
+          FROM $tableTemps
+          GROUP BY ${TempsField.parcours}, ${TempsField.dossard}
+        ) AS counts
+        GROUP BY ${TempsField.parcours}, time_count
+        ORDER BY ${TempsField.parcours} ASC, time_count ASC
+      ''');
+    }
 
     final counts = result.map((row) => {
       'parcours': row['parcours'].toString(),
@@ -438,25 +463,45 @@ class DatabaseManager {
     if (targetTimeCount == 0) {
       final equipes = (await getEquipes(parcours)).map((eq) => eq.dossard);
 
-      final result = await db.rawQuery('''
-        SELECT DISTINCT ${TempsField.dossard}
-        FROM $tableTemps
-        WHERE ${TempsField.parcours} = '$parcours'
-      ''');
+      final result;
+      if (ravito != 'admin') {
+        result = await db.rawQuery('''
+          SELECT DISTINCT ${TempsField.dossard}
+          FROM $tableTemps
+          WHERE ${TempsField.parcours} = '$parcours' AND ${TempsField.ravito} = '$ravito'
+        ''');
+      } else {
+        result = await db.rawQuery('''
+          SELECT DISTINCT ${TempsField.dossard}
+          FROM $tableTemps
+          WHERE ${TempsField.parcours} = '$parcours'
+        ''');
+      }
 
       final dossardsAvecTemps = result.map((row) => row[TempsField.dossard] as int).toSet();
       return equipes.where((dossard) => !dossardsAvecTemps.contains(dossard)).toList();
 
     } else {
-      final result = await db.rawQuery('''
-        SELECT ${TempsField.dossard}, COUNT(*) as time_count
-        FROM $tableTemps
-        WHERE ${TempsField.parcours} = '$parcours' AND ${TempsField.ravito} = '$ravito'
-        GROUP BY ${TempsField.dossard}
-        HAVING time_count = $targetTimeCount
-      ''');
+      final result;
+      if (ravito != 'admin') {
+        result = await db.rawQuery('''
+          SELECT ${TempsField.dossard}, COUNT(*) as time_count
+          FROM $tableTemps
+          WHERE ${TempsField.parcours} = '$parcours' AND ${TempsField.ravito} = '$ravito'
+          GROUP BY ${TempsField.dossard}
+          HAVING time_count = $targetTimeCount
+        ''');
+      } else {
+        result = await db.rawQuery('''
+          SELECT ${TempsField.dossard}, COUNT(*) as time_count
+          FROM $tableTemps
+          WHERE ${TempsField.parcours} = '$parcours'
+          GROUP BY ${TempsField.dossard}
+          HAVING time_count = $targetTimeCount
+        ''');
+      }
 
-      return result.map((row) => row[TempsField.dossard] as int).toList();
+      return result.map<int>((row) => row[TempsField.dossard] as int).toList();
     }
   }
 
@@ -476,5 +521,51 @@ class DatabaseManager {
     ''');
     List<Remarque> r = result.map((e) => Remarque.fromJson(e)).toList();
     return r;
+  }
+
+  Future compteTempsManquants() async { 
+    final db = await instance.database;
+    final result2 = await db.rawQuery('''
+      SELECT 
+        ${TempsField.dossard} AS dossard, 
+        ${TempsField.ravito} AS ravito, 
+        COUNT(*) AS time_count, 
+        ${TempsField.parcours} AS parcours
+      FROM $tableTemps
+      GROUP BY ${TempsField.dossard}, ${TempsField.ravito}, ${TempsField.parcours};
+    ''');
+
+    Map<String, List<Map<int, Map<String, int>>>> data = {};
+
+    for (var row in result2) {
+      final int dossard = row['dossard'] as int;
+      final String ravito = row['ravito'] as String;
+      final int timeCount = row['time_count'] as int;
+      final String parcours = row['parcours'] as String;
+      final ravitos = {ravito: timeCount};
+      if (!data.containsKey(parcours)) {
+        data[parcours] = [];
+      }
+      final existingEntry = data[parcours]!.firstWhere(
+        (entry) => entry.containsKey(dossard),
+        orElse: () => {},
+      );
+      if (existingEntry.isNotEmpty) {
+        existingEntry[dossard]!.addAll(ravitos);
+      } else {
+        data[parcours]!.add({dossard: ravitos});
+      }
+    }
+
+    print(data);
+
+    final nb_epr = await compteEpreuves();
+
+    print(nb_epr);
+
+
+    
+
+    return 1;
   }
 }

@@ -19,7 +19,18 @@ Future<List<Map<String,String>>> readJsonEquipes() async {
 
 Future<Map<String, List<String>>> readJsonEpreuves(ravito) async {
   final String response = await rootBundle.loadString('assets/Epreuves.json');
-  final Map<String, dynamic> data = json.decode(response)[ravito]["Epreuves"];
+  final d = json.decode(response);
+  final Map<String, dynamic> data;
+  if (ravito == 'admin') { 
+    data = {"Découverte": [], "Sportif": [], "Expert": []};
+    for (var r in d.keys) {
+      for (var p in ["Découverte", "Sportif", "Expert"]) {
+        data[p] = [data[p], d[r]["Epreuves"][p]].expand((x) => x).toList();
+      }
+    }
+  } else {
+    data = d[ravito]["Epreuves"];
+  }
   final Map<String, List<String>> data2 = Map.fromEntries(
     data.entries
       .where((entry) => entry.key != "CO")
@@ -31,6 +42,20 @@ Future<Map<String, List<String>>> readJsonEpreuves(ravito) async {
       ),
   );
   return data2;
+
+}
+
+Future compteEpreuves() async {
+  final String response = await rootBundle.loadString('assets/Epreuves.json');
+  final d = json.decode(response);
+  final Map<String, dynamic> data;
+  data = {"Découverte": {}, "Sportif": {}, "Expert": {}};
+  for (var r in d.keys) {
+    for (var p in ["Découverte", "Sportif", "Expert"]) {
+      data[p][r] = d[r]["Epreuves"][p].length;
+    }
+  }
+  return data;
 }
 
 Future<List<String>> getRavitos() async {

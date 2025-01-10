@@ -58,7 +58,6 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
         final List<Temps> temps = data[1];
         final List<String> epreuves = data[2][parcours];
         final int nb_cols = min(temps.length + 1, epreuves.length);
-        print(nb_cols);
 
         return AlertDialog(
           scrollable: true,
