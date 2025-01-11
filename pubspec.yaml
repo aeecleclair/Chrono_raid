@@ -1,6 +1,6 @@
 name: chrono_raid
 description: "A new Flutter project."
-publish_to: 'none' 
+publish_to: 'none'
 
 version: 1.0.0+1
 
@@ -8,30 +8,47 @@ environment:
   sdk: ^3.5.4
 
 dependencies:
+  auto_size_text: ^3.0.0
+  cupertino_icons: ^1.0.8
+  datetime_picker_formfield: ^2.0.1
+  device_info_plus: ^11.2.0
+  flash: ^3.1.1
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
-  flutter_riverpod: ^2.1.1
+  flutter_appauth: ^8.0.3
+  flutter_datetime_picker_plus: ^2.2.0
+  flutter_dotenv: ^5.2.1
   flutter_hooks: ^0.20.0
-  sqflite: ^2.4.1
+  flutter_riverpod: ^2.1.1
+  flutter_secure_storage: ^9.2.4
+  google_fonts: ^6.2.1
+  heroicons: ^0.11.0
+  hooks_riverpod: ^2.6.1
+  http: ^1.2.2
+  intl: ^0.19.0
+  jwt_decoder: ^2.0.1
+  package_info_plus: ^8.1.2
   path: ^1.8.0
   path_provider_android: ^2.0.15
-  sqlite3_flutter_libs: ^0.5.26
-  uuid: ^4.5.1
-  toastification: ^2.3.0
-  intl: ^0.19.0
-  flutter_datetime_picker_plus: ^2.2.0
+  qlevar_router: ^1.12.0
+  shared_preferences: ^2.3.5
+  smooth_page_indicator: ^1.2.0+3
+  sqflite: ^2.4.1
   sqflite_common_ffi: ^2.3.4+4
+  sqlite3_flutter_libs: ^0.5.26
+  syncfusion_flutter_calendar: ^28.1.38
+  toastification: ^2.3.0
+  universal_html: ^2.2.4
+  uuid: ^4.5.1
+  zxcvbn: ^1.0.0
 
 dev_dependencies:
+  flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
-
-  flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true
   assets:
     - assets/Equipes.json
     - assets/Epreuves.json
-
