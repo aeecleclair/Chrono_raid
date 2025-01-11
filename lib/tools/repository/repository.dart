@@ -6,7 +6,7 @@ import 'package:chrono_raid/tools/cache/cache_manager.dart';
 import 'package:chrono_raid/tools/exception.dart';
 
 abstract class Repository {
-  static final String host = "qzjerbgqefbqnm"; // TODO a changer
+  static const String host = "https://hyperion.myecl.fr";
   static const String expiredTokenDetail = "Could not validate credentials";
   final String ext = "";
   final Map<String, String> headers = {

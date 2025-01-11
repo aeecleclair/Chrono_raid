@@ -34,7 +34,7 @@ class AppSignIn extends HookConsumerWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "MyECL",
+                  "Chrono Raid",
                   style: GoogleFonts.elMessiri(
                     textStyle: const TextStyle(
                       fontSize: 40,
@@ -67,18 +67,18 @@ class AppSignIn extends HookConsumerWidget {
                           onPressed: () async {
                             await authNotifier.getTokenFromRequest();
                             ref.watch(authTokenProvider).when(
-                                  data: (token) {
-                                    QR.to(pathForwarding.path);
-                                  },
-                                  error: (e, s) {
-                                    displayToast(
-                                      context,
-                                      TypeMsg.error,
-                                      LoginTextConstants.loginFailed,
-                                    );
-                                  },
-                                  loading: () {},
+                              data: (token) {
+                                QR.to(pathForwarding.path);
+                              },
+                              error: (e, s) {
+                                displayToast(
+                                  context,
+                                  TypeMsg.error,
+                                  LoginTextConstants.loginFailed,
                                 );
+                              },
+                              loading: () {},
+                            );
                           },
                           color: ColorConstants.background2,
                           icon: const HeroIcon(

@@ -1,11 +1,14 @@
 import 'dart:io';
 
+import 'package:chrono_raid/auth/providers/openid_provider.dart';
+import 'package:chrono_raid/login/ui/app_sign_in.dart';
 import 'package:chrono_raid/ui/onglet_CO.dart';
 import 'package:chrono_raid/ui/functions.dart';
 import 'package:chrono_raid/ui/onglet_edit_action.dart';
 import 'package:chrono_raid/ui/page_admin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'ui/onglet_dossard_unique.dart';
 import 'ui/onglet_dossard_groupe.dart';
@@ -22,7 +25,11 @@ Future<void> main() async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   }
-  runApp(MyApp());
+  runApp(
+    ProviderScope(
+      child: MyApp()
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -39,10 +46,13 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final token = ref.watch(tokenProvider);
+    if (token.isEmpty) {
+      return AppSignIn();
+    }
     return FutureBuilder<List<String>>(
       future: getRavitos(),
       builder: (context, snapshot) {

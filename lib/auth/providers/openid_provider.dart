@@ -7,7 +7,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
-import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsDesktop, kIsWeb;
 import 'package:chrono_raid/auth/providers/is_connected_provider.dart';
 import 'package:chrono_raid/auth/repository/openid_repository.dart';
 import 'package:chrono_raid/tools/cache/cache_manager.dart';
@@ -151,10 +151,9 @@ class OpenIdTokenProvider
 
     state = const AsyncValue.loading();
     try {
-      if (kIsWeb) {
+      if (kIsWeb || kIsDesktop) {
         popupWin = html.window
             .open(authUrl, "Hyperion", "width=800, height=900, scrollbars=yes");
-
         final completer = Completer();
         void checkWindowClosed() {
           if (popupWin != null && popupWin!.closed == true) {
@@ -245,7 +244,7 @@ class OpenIdTokenProvider
     _secureStorage.read(key: tokenName).then((token) async {
       if (token != null) {
         try {
-          if (kIsWeb) {
+          if (kIsWeb || kIsDesktop) {
             final resp = await openIdRepository.getToken(
               token,
               clientId,
