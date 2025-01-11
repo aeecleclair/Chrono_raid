@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:chrono_raid/tools/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:chrono_raid/login/tools/constants.dart';
 
 class Point {
   final double x;
