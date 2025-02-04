@@ -222,7 +222,7 @@ class DatabaseManager {
     final result = await db.rawQuery('''
       SELECT COUNT(*) as c
       FROM $tableTemps
-      WHERE ${TempsField.dossard} = '${t.dossard}'
+      WHERE ${TempsField.dossard} = '${t.dossard}' AND ${TempsField.ravito} = '${t.ravito}'
     ''');
     final int nb_temps = result[0]['c'] as int;
     if (nb_temps >= nb_epreuves) {
@@ -513,19 +513,28 @@ class DatabaseManager {
   
   Future<List<Remarque>> getRemarque(String ravito) async {
     final db = await instance.database;
-    final result = await db.rawQuery('''
-      SELECT *
-      FROM $tableRemarque
-      WHERE ${ActionField.ravito} = '$ravito'
-      ORDER BY ${ActionField.date} ASC
-    ''');
-    List<Remarque> r = result.map((e) => Remarque.fromJson(e)).toList();
+    final result;
+    if (ravito != 'admin') {
+      result = await db.rawQuery('''
+        SELECT *
+        FROM $tableRemarque
+        WHERE ${RemarqueField.ravito} = '$ravito'
+        ORDER BY ${RemarqueField.date} ASC
+      ''');
+    } else {
+      result = await db.rawQuery('''
+        SELECT *
+        FROM $tableRemarque
+        ORDER BY ${RemarqueField.date} ASC
+      ''');
+    }
+    List<Remarque> r = result.map<Remarque>((e) => Remarque.fromJson(e)).toList();
     return r;
   }
 
-  Future compteTempsManquants() async { 
+  Future<Map<String,List<Map<String, String>>>> compteTempsManquants() async { 
     final db = await instance.database;
-    final result2 = await db.rawQuery('''
+    final result = await db.rawQuery('''
       SELECT 
         ${TempsField.dossard} AS dossard, 
         ${TempsField.ravito} AS ravito, 
@@ -535,37 +544,53 @@ class DatabaseManager {
       GROUP BY ${TempsField.dossard}, ${TempsField.ravito}, ${TempsField.parcours};
     ''');
 
-    Map<String, List<Map<int, Map<String, int>>>> data = {};
+    Map<String, Map<int, Map<String, int>>> data = {};
 
-    for (var row in result2) {
+    for (var row in result) {
       final int dossard = row['dossard'] as int;
       final String ravito = row['ravito'] as String;
       final int timeCount = row['time_count'] as int;
       final String parcours = row['parcours'] as String;
-      final ravitos = {ravito: timeCount};
-      if (!data.containsKey(parcours)) {
-        data[parcours] = [];
-      }
-      final existingEntry = data[parcours]!.firstWhere(
-        (entry) => entry.containsKey(dossard),
-        orElse: () => {},
-      );
-      if (existingEntry.isNotEmpty) {
-        existingEntry[dossard]!.addAll(ravitos);
-      } else {
-        data[parcours]!.add({dossard: ravitos});
+      data.putIfAbsent(parcours, () => {});
+      data[parcours]!.putIfAbsent(dossard, () => {});
+      data[parcours]![dossard]![ravito] = timeCount;
+    }
+
+    final nb_epr = await compteEpreuves();
+    Map<String,List<Map<String, String>>> temps_manquants = {"Expert": [], "Sportif": [], "Découverte": []};
+
+    for (var p in data.keys) {
+      for (var d in data[p]!.entries) {
+        int i = 2;
+        int nb = 0;
+        for (var e_i in List.generate(nb_epr[p]!.entries.length, (i) => i)) {
+          dynamic e = nb_epr[p]!.entries.toList()[e_i];
+          d.value[e.key] ??= 0;
+          if (d.value[e.key] == 0) {
+            i = 0;
+          } else if (e.value == d.value[e.key]) {
+            if (i != 2) {
+              temps_manquants[p]!.add({
+                'dossard': d.key.toString(),
+                'ravito': nb_epr[p]!.keys.toList()[e_i-1],
+                'nb': nb.toString()
+              });
+            }
+            i = 2;
+          } else if (e.value > d.value[e.key]) {
+            if (i != 2) {
+              temps_manquants[p]!.add({
+                'dossard': d.key.toString(),
+                'ravito': nb_epr[p]!.keys.toList()[e_i-1],
+                'nb': nb.toString()
+              });            }
+            i = 1;
+          }
+          nb = e.value - d.value[e.key];
+        }
       }
     }
 
-    print(data);
-
-    final nb_epr = await compteEpreuves();
-
-    print(nb_epr);
-
-
-    
-
-    return 1;
+    return temps_manquants;
   }
 }

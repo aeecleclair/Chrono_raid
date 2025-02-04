@@ -14,6 +14,8 @@ import 'package:chrono_raid/tools/cache/cache_manager.dart';
 import 'package:chrono_raid/tools/repository/repository.dart';
 import 'dart:convert';
 import 'package:universal_html/html.dart' as html;
+import 'package:url_launcher/url_launcher.dart';
+
 
 final authTokenProvider =
     StateNotifierProvider<OpenIdTokenProvider, AsyncValue<Map<String, String>>>(
@@ -147,14 +149,20 @@ class OpenIdTokenProvider
     final codeVerifier = generateRandomString(128);
 
     final authUrl =
-        "${Repository.host}auth/authorize?client_id=$clientId&response_type=code&scope=${scopes.join(" ")}&redirect_uri=$redirectUri&code_challenge=${hash(codeVerifier)}&code_challenge_method=S256";
+        "${Repository.host}/auth/authorize?client_id=$clientId&response_type=code&scope=${scopes.join(" ")}&redirect_uri=$redirectUri&code_challenge=${hash(codeVerifier)}&code_challenge_method=S256";
 
     state = const AsyncValue.loading();
     try {
-      if (kIsWeb || kIsDesktop) {
-        popupWin = html.window
-            .open(authUrl, "Hyperion", "width=800, height=900, scrollbars=yes");
+      if (kIsDesktop) {
+        final Uri monUrl = Uri(
+          scheme: 'https',
+          path: authUrl,
+        );
+        launchUrl(monUrl);
+        print('a');
+        
         final completer = Completer();
+
         void checkWindowClosed() {
           if (popupWin != null && popupWin!.closed == true) {
             completer.complete();
@@ -244,7 +252,7 @@ class OpenIdTokenProvider
     _secureStorage.read(key: tokenName).then((token) async {
       if (token != null) {
         try {
-          if (kIsWeb || kIsDesktop) {
+          if (kIsDesktop) {
             final resp = await openIdRepository.getToken(
               token,
               clientId,

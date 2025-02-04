@@ -1,6 +1,8 @@
 import 'package:chrono_raid/ui/remarque.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:toastification/toastification.dart';
 
 import 'database.dart';
 
@@ -11,12 +13,24 @@ class OngletRemarque extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+      final dbm = DatabaseManager();
+    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
 
     void envoyer() async {
-      final dbm = DatabaseManager();
       String remarque_text = _controllerRemarque.text;
       await dbm.createRemarque(Remarque(DateTime.now().toIso8601String(), ravito, remarque_text));
       _controllerRemarque.clear();
+      toastification.show(
+        context: context,
+        title: const Text('Remarque ajoutée !'),
+        autoCloseDuration: const Duration(seconds: 3),
+        primaryColor: Colors.black,
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.black,
+        icon: const Icon(Icons.check_circle_outlined),
+        closeOnClick: true,
+        alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+      );
     }
 
     return Center(

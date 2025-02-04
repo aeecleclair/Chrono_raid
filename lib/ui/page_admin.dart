@@ -1,7 +1,10 @@
 
 import 'package:chrono_raid/ui/functions.dart';
+import 'package:chrono_raid/ui/onglet_compilateur.dart';
 import 'package:chrono_raid/ui/onglet_compte.dart';
+import 'package:chrono_raid/ui/onglet_consulte_remarque.dart';
 import 'package:chrono_raid/ui/onglet_edit_temps.dart';
+import 'package:chrono_raid/ui/onglet_remarque.dart';
 import 'package:chrono_raid/ui/onglet_temps_manquants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +23,7 @@ class _MainPageState extends State<PageAdmin> {
     final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
     return MaterialApp(
       home: DefaultTabController(
-        length: 3,
+        length: 5,
         child: Scaffold(
           appBar: AppBar(
               title: Row(
@@ -60,8 +63,9 @@ class _MainPageState extends State<PageAdmin> {
         for (final tab in [
           {'icon': Icons.supervisor_account_outlined, 'text': 'Compte'},
           {'icon': Icons.edit, 'text': 'Temps'},
+          {'icon': Icons.speaker_notes, 'text': 'Remarques'},
           {'icon': Icons.access_time, 'text': 'Temps Manquants'},
-          //{'icon': Icons.speaker_notes, 'text': 'Remarques'},
+          {'icon': Icons.calculate_outlined, 'text': 'Compilateur'},
         ])
           Tab(
             child: Wrap(
@@ -90,29 +94,19 @@ class _MainPageState extends State<PageAdmin> {
         body: Column(
           children: [
             Expanded(
-              child: TabBarView(
-                physics: NeverScrollableScrollPhysics(),
-                children: [
-                  // Onglet compte dossard
-                  OngletCompte('admin'),
-        
-                  // Onglet consulte et edit temps
-                  OngletEditTemps('admin'),
-
-                  // Onglet temps manquants
-                  OngletTempsManquants(),
-        
-                  // Onglet remarque
-                  //OngletRemarque('admin'),
-                ],
-              ),
+              child: Tabs()
             ),
             Divider(thickness: 1),
           ]
         ),
       );
     }
-    final ravitoValue = useState('admin');
+    return Tabs();
+  }
+
+  Widget Tabs() {
+    final ravitoValue = [useState('admin'), useState('admin'), useState('admin')];
+
     return FutureBuilder(
       future: getRavitos(), 
       builder: (context, snapshot) {
@@ -127,36 +121,46 @@ class _MainPageState extends State<PageAdmin> {
         var ravitos = snapshot.data!;
         ravitos = ravitos + ['Tout'];
         
+        final editTempsScrollController = ScrollController();
+        
+        List Onglets = [
+          OngletCompte(ravitoValue[0].value), // Onglet compte dossard
+          OngletEditTemps(ravitoValue[1].value, editTempsScrollController), // Onglet consulte et edit temps
+          OngletConsulteRemarque(ravitoValue[2].value), // Onglet remarque
+        ];
+
         return TabBarView(
+          physics: NeverScrollableScrollPhysics(),
           children: [
-            // Onglet compte dossard
-            Column(
-              children: [
-                DropdownButton(
-                  value: ravitoValue.value,
-                  icon: const Icon(Icons.keyboard_arrow_down),
-                  items: ravitos.map<DropdownMenuItem<Object>>((String r) {
-                    return DropdownMenuItem(
-                      value: r=='Tout'?'admin':r,
-                      child: Text(r),
-                    );
-                  }).toList(),
-                  onChanged: (value) { 
-                    ravitoValue.value = value.toString();
-                  },
+            for (var i in List.generate(Onglets.length, (i) => i)) ... [
+              SingleChildScrollView(
+                controller: i==1? editTempsScrollController : null,
+                child: Column(
+                  children: [
+                    DropdownButton(
+                      value: ravitoValue[i].value,
+                      icon: const Icon(Icons.keyboard_arrow_down),
+                      items: ravitos.map<DropdownMenuItem<Object>>((String r) {
+                        return DropdownMenuItem(
+                          value: r=='Tout'?'admin':r,
+                          child: Text(r),
+                        );
+                      }).toList(),
+                      onChanged: (value) { 
+                        ravitoValue[i].value = value.toString();
+                      },
+                    ),
+                    Onglets[i],
+                  ],
                 ),
-                OngletCompte(ravitoValue.value),
-              ],
-            ),
-
-            // Onglet consulte et edit temps
-            OngletEditTemps('admin'),
-
+              ),
+            ],
+        
             // Onglet temps manquants
-            OngletTempsManquants(),
-
-            // Onglet remarque
-            //OngletRemarque('admin'),
+            SingleChildScrollView(child: OngletTempsManquants()),
+        
+            // Onglet Compilateur
+            OngletCompilateur(),
           ],
         );
       }

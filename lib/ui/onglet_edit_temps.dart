@@ -10,7 +10,8 @@ import 'functions.dart';
 
 class OngletEditTemps extends HookWidget {
   final String ravito;
-  const OngletEditTemps(this.ravito, {super.key});
+  final pageScrollController;
+  const OngletEditTemps(this.ravito, this.pageScrollController, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +19,8 @@ class OngletEditTemps extends HookWidget {
     final refresh = useState(false);
     final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
     final dropdown = useState({"Expert":true, "Sportif":true, "Découverte":true});
-    final scrollController = {"Expert":ScrollController(), "Sportif":ScrollController(), "Découverte":ScrollController()};
-    final pageScrollController = ScrollController();
+    final scrollController = {"Expert": ScrollController(), "Sportif": ScrollController(), "Découverte": ScrollController()};
+    //final pageScrollController = ScrollController();
 
     return FutureBuilder<List<Object>>(
       future: Future.wait([
@@ -38,79 +39,76 @@ class OngletEditTemps extends HookWidget {
         final temps = data[0];
         final epreuves = data[1];
 
-        return SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          controller: pageScrollController,
-          child: Column(
-            children: [
-              for (var parcours in ["Expert", "Sportif", "Découverte"]) ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      parcours,
-                      style: const TextStyle(
-                        fontSize: 30,
-                        decoration: TextDecoration.underline,
-                      ),
+        return Column(
+          children: [
+            for (var parcours in ["Expert", "Sportif", "Découverte"]) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    parcours,
+                    style: const TextStyle(
+                      fontSize: 30,
+                      decoration: TextDecoration.underline,
                     ),
-                    TextButton(
-                      onPressed: () {
-                        dropdown.value[parcours] = !dropdown.value[parcours]!;
-                        refresh.value = !refresh.value;
-                      },
-                      child: dropdown.value[parcours]! ? Icon(Icons.keyboard_arrow_up) : Icon(Icons.keyboard_arrow_down),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                if (temps[parcours] != null && dropdown.value[parcours]!)
-                  if (isMobile) ...[
-                    NotificationListener<OverscrollNotification>(
-                      onNotification: (OverscrollNotification notification) {
-                        if (notification.metrics.axis == Axis.vertical) {
-                          pageScrollController.position
-                              .moveTo(pageScrollController.position.pixels + notification.overscroll);
-                        }
-                        return true;
-                      },
-                      child: NotificationListener<OverscrollIndicatorNotification>(
-                        onNotification: (OverscrollIndicatorNotification notification) {
-                          notification.disallowIndicator();
-                          return true;
-                        },
-                        child: Scrollbar(
-                          controller: scrollController[parcours],
-                          thumbVisibility: true,
-                          child: SingleChildScrollView(
-                            controller: scrollController[parcours],
-                            scrollDirection: Axis.horizontal,
-                            child: SizedBox(
-                              width: max(((epreuves[parcours].length + 2) * 80).toDouble(), MediaQuery.of(context).size.width),
-                              child: grid(epreuves[parcours], temps[parcours], isMobile, refresh),
-                            ),
-                          ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      dropdown.value[parcours] = !dropdown.value[parcours]!;
+                      refresh.value = !refresh.value;
+                    },
+                    child: dropdown.value[parcours]! ? Icon(Icons.keyboard_arrow_up) : Icon(Icons.keyboard_arrow_down),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              if (temps[parcours] != null && dropdown.value[parcours]!)
+                NotificationListener<OverscrollNotification>(
+                  onNotification: (OverscrollNotification notification) {
+                    if (notification.metrics.axis == Axis.vertical) {
+                      pageScrollController.position
+                          .moveTo(pageScrollController.position.pixels + notification.overscroll);
+                    }
+                    return true;
+                  },
+                  child: NotificationListener<OverscrollIndicatorNotification>(
+                    onNotification: (OverscrollIndicatorNotification notification) {
+                      notification.disallowIndicator();
+                      return true;
+                    },
+                    child: Scrollbar(
+                      controller: scrollController[parcours],
+                      thumbVisibility: true,
+                      child: SingleChildScrollView(
+                        controller: scrollController[parcours],
+                        scrollDirection: Axis.horizontal,
+                        child: Builder(
+                          builder: (context) {
+                            double w = max(((epreuves[parcours].length + 2) * 120).toDouble(), MediaQuery.of(context).size.width);
+                            return SizedBox(
+                              width: w,
+                              child: grid(epreuves[parcours], temps[parcours], isMobile, refresh, w),
+                            );
+                          }
                         ),
                       ),
                     ),
-                  ] else ...[
-                    grid(epreuves[parcours], temps[parcours], isMobile, refresh),
-                  ],
-                const SizedBox(height: 10),
-              ],
+                  ),
+                ),
+              const SizedBox(height: 10),
             ],
-          ),
+          ],
         );
       },
     );
   }
 
-  Widget grid(epreuves, temps, isMobile, refresh) {
+  Widget grid(epreuves, temps, isMobile, refresh, w) {
     return GridView.builder(
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: epreuves.length + 2,
-        childAspectRatio: isMobile ? 1.5 : 50/(epreuves.length + 2),
+        childAspectRatio: w/(epreuves.length + 2)/50,
       ),
       itemCount: epreuves.length + 2 + temps.length * (epreuves.length + 2),
       itemBuilder: (context, index) {
@@ -136,6 +134,7 @@ class OngletEditTemps extends HookWidget {
                   child: Text(
                     isMobile? epreuves[index - 1].replaceFirst(' ', '\n') : epreuves[index - 1],
                     style: const TextStyle(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
                   ),
                 );
               } else {

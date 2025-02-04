@@ -28,6 +28,7 @@ class OngletCompte extends HookWidget {
         return Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               for (var parcours in ["Expert", "Sportif", "Découverte"])
                 Column(
