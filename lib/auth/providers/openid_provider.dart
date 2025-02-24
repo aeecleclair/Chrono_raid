@@ -1,5 +1,6 @@
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
@@ -108,23 +109,20 @@ final tokenProvider = Provider((ref) {
         orElse: () => "",
       );
 });
-
 class OpenIdTokenProvider
     extends StateNotifier<AsyncValue<Map<String, String>>> {
-  FlutterAppAuth appAuth = const FlutterAppAuth();
-  final CacheManager cacheManager = CacheManager();
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  final Base64Codec base64 = const Base64Codec.urlSafe();
   final OpenIdRepository openIdRepository = OpenIdRepository();
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   final String tokenName = "my_ecl_auth_token";
   final String clientId = "Titan";
   final String tokenKey = "token";
   final String refreshTokenKey = "refresh_token";
+  final List<String> scopes = ["API"];
+  final FlutterAppAuth appAuth = const FlutterAppAuth();
   final String redirectUrl = "<<>>://authorized";   // TODO :
-  final String redirectUrlHost = "myecl.fr";
+  final String redirectUrlHost = "localhost"; //"myecl.fr";
   final String discoveryUrl =
       "${Repository.host}.well-known/openid-configuration";
-  final List<String> scopes = ["API"];
   OpenIdTokenProvider() : super(const AsyncValue.loading());
 
   String generateRandomString(int len) {
@@ -134,97 +132,50 @@ class OpenIdTokenProvider
     return List.generate(len, (index) => chars[r.nextInt(chars.length)]).join();
   }
 
-  String hash(String data) {
-    return base64.encode(sha256.convert(utf8.encode(data)).bytes);
+  // String hash(String data) {
+  //   return base64.encode(sha256.convert(utf8.encode(data)).bytes);
+  // }
+
+  String hash(String codeVerifier) {
+    var bytes = utf8.encode(codeVerifier);
+    var digest = sha256.convert(bytes);
+    return base64Url.encode(digest.bytes).replaceAll('=', '');
   }
 
-  Future getTokenFromRequest() async {
-    html.WindowBase? popupWin;
-
-    final redirectUri = Uri(
-      host: redirectUrlHost,
-      scheme: "https",
-      path: '/static.html',
-    );
-    final codeVerifier = generateRandomString(128);
-
-    final authUrl =
-        "${Repository.host}/auth/authorize?client_id=$clientId&response_type=code&scope=${scopes.join(" ")}&redirect_uri=$redirectUri&code_challenge=${hash(codeVerifier)}&code_challenge_method=S256";
-
-    state = const AsyncValue.loading();
+  Future<void> getTokenFromRequest() async {
     try {
       if (kIsDesktop) {
-        final Uri monUrl = Uri(
-          scheme: 'https',
-          path: authUrl,
+        final redirectUri = Uri(
+          scheme: "http",
+          host: redirectUrlHost,
+          port: 8001, //pour les tests en local
+          path: "/static.html",
         );
-        launchUrl(monUrl);
-        print('a');
+        final codeVerifier = generateRandomString(128);
+        final codeChallenge = hash(codeVerifier);
+
+        startLocalServer(redirectUri.toString(), codeVerifier);
+
+        final Uri monUrl = Uri(
+          scheme: 'http',
+          host: Repository.host,
+          port: 8000, //pour les tests en local
+          path: "/auth/authorize",
+          queryParameters: {
+            'client_id': clientId,
+            'response_type': 'code',
+            'scope': scopes.join(" "),
+            'redirect_uri': redirectUri.toString(),
+            'code_challenge': codeChallenge,
+            'code_challenge_method': 'S256',
+          },
+        );
         
-        final completer = Completer();
-
-        void checkWindowClosed() {
-          if (popupWin != null && popupWin!.closed == true) {
-            completer.complete();
-          } else {
-            Future.delayed(
-              const Duration(milliseconds: 100),
-              checkWindowClosed,
-            );
-          }
+        if (await canLaunchUrl(monUrl)) {
+          await launchUrl(monUrl, mode: LaunchMode.externalApplication);
+        } else {
+          print("Impossible d'ouvrir l'URL : $monUrl");
         }
-
-        checkWindowClosed();
-        completer.future.then((_) {
-          state.maybeWhen(
-            loading: () {
-              state = AsyncValue.data({
-                tokenKey: "",
-                refreshTokenKey: "",
-              });
-            },
-            orElse: () {},
-          );
-        });
-
-        void login(String data) async {
-          final receivedUri = Uri.parse(data);
-          final token = receivedUri.queryParameters["code"];
-          if (popupWin != null) {
-            popupWin!.close();
-            popupWin = null;
-          }
-          try {
-            if (token != null && token.isNotEmpty) {
-              final resp = await openIdRepository.getToken(
-                token,
-                clientId,
-                redirectUri.toString(),
-                codeVerifier,
-                "authorization_code",
-              );
-              final accessToken = resp[tokenKey]!;
-              final refreshToken = resp[refreshTokenKey]!;
-              await _secureStorage.write(key: tokenName, value: refreshToken);
-              state = AsyncValue.data({
-                tokenKey: accessToken,
-                refreshTokenKey: refreshToken,
-              });
-            } else {
-              throw Exception('Wrong credentials');
-            }
-          } on TimeoutException catch (_) {
-            throw Exception('No response from server');
-          } catch (e) {
-            rethrow;
-          }
-        }
-
-        html.window.onMessage.listen((event) {
-          if (event.data.toString().contains('code=')) {
-            login(event.data);
-          }
-        });
       } else {
         AuthorizationTokenResponse resp =
             await appAuth.authorizeAndExchangeCode(
@@ -244,6 +195,57 @@ class OpenIdTokenProvider
       }
     } catch (e) {
       state = AsyncValue.error("Error $e", StackTrace.empty);
+    }
+  }
+
+  void startLocalServer(String redirectUri, String codeVerifier) async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8001);
+    print("Serveur local démarré : http://127.0.0.1:8001");
+
+    await for (HttpRequest request in server) {
+      final uri = request.uri;
+      if (uri.path == "/static.html" && uri.queryParameters.containsKey('code')) {
+        final code = uri.queryParameters['code'] ?? "";
+        print("Code reçu : $code");
+        _exchangeCodeForToken(code, redirectUri, codeVerifier);
+
+        // Réponse HTML affichée dans le navigateur
+        request.response
+          ..statusCode = 200
+          ..headers.contentType = ContentType.html
+          ..write('<html><head><title>Connexion réussie</title></head><body>Connexion réussie. Vous pouvez fermer cette fenêtre.</body></html>');
+        await request.response.close();
+
+        // Arrêter le serveur après réception du code
+        await server.close();
+        print("Serveur local arrêté.");
+        break; // Sortir de la boucle après traitement
+      }
+    }
+  }
+
+  Future<void> _exchangeCodeForToken(String code, String redirectUri, String codeVerifier) async {
+    try {
+      final resp = await openIdRepository.getToken(
+        code,
+        clientId,
+        redirectUri,
+        codeVerifier,
+        "authorization_code",
+      );
+      final accessToken = resp[tokenKey]!;
+      final refreshToken = resp[refreshTokenKey]!;
+
+      await _secureStorage.write(key: tokenName, value: refreshToken);
+      state = AsyncValue.data({
+        tokenKey: accessToken,
+        refreshTokenKey: refreshToken,
+      });
+
+      print("Access Token : $accessToken");
+      print("Refresh Token : $refreshToken");
+    } catch (e) {
+      print("Erreur lors de l'échange du code : $e");
     }
   }
 
@@ -365,8 +367,6 @@ class OpenIdTokenProvider
   void deleteToken() {
     try {
       _secureStorage.delete(key: tokenName);
-      cacheManager.deleteCache(tokenName);
-      cacheManager.deleteCache("id");
       state = AsyncValue.data({tokenKey: "", refreshTokenKey: ""});
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.empty);

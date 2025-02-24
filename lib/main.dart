@@ -205,79 +205,52 @@ class _MainPageState extends State<MainPage> {
 
   Widget buildTabsContent(bool isMobile, bool CO, String ravito) {
     final editTempsScrollController = ScrollController();
-    if (true) {
-      return Column(
-        children: [
-          Expanded(
-            child: TabBarView(
-              physics: NeverScrollableScrollPhysics(),
-              children: [
-                if (isMobile) ...[
-                  // Onglet fusionné dossard unique et groupe
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      OngletDossardUnique(ravito),
-                      Divider(thickness: 1,),
-                      OngletDossardGroupe(ravito),
-                    ],
-                  ),
-                ] else ...[
-                  // Onglet départ dossard unique
-                  OngletDossardUnique(ravito),
-
-                  // Onglet départ dossard groupe
-                  OngletDossardGroupe(ravito),
-                ],
-
-                // Onglet CO
-                if (CO) OngletCO(),
-      
-                // Onglet compte dossard
-                SingleChildScrollView(child: OngletCompte(ravito)),
-      
-                // Onglet consulte et edit temps
-                SingleChildScrollView(
-                  controller: editTempsScrollController,
-                  child: OngletEditTemps(ravito, editTempsScrollController)
-                ),
-                
-                // Onglet consulte et edit actions
-                SingleChildScrollView(child: OngletEditAction(ravito)),
-      
-                // Onglet remarque
-                SingleChildScrollView(child: OngletRemarque(ravito)),
-              ],
-            ),
-          ),
-          if (isMobile) Divider(thickness: 1),
-        ]
-      );
-    }
-    return  TabBarView(
-      physics: NeverScrollableScrollPhysics(),
+    return Column(
       children: [
-        // Onglet départ dossard unique
-        OngletDossardUnique(ravito),
+        Expanded(
+          child: TabBarView(
+            physics: NeverScrollableScrollPhysics(),
+            children: [
+              if (isMobile) ...[
+                // Onglet fusionné dossard unique et groupe
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    OngletDossardUnique(ravito),
+                    Divider(thickness: 1,),
+                    OngletDossardGroupe(ravito),
+                  ],
+                ),
+              ] else ...[
+                // Onglet départ dossard unique
+                OngletDossardUnique(ravito),
 
-        // Onglet départ dossard groupe
-        OngletDossardGroupe(ravito),
+                // Onglet départ dossard groupe
+                OngletDossardGroupe(ravito),
+              ],
 
-        // Onglet CO
-        if (CO) OngletCO(),
-
-        // Onglet compte dossard
-        OngletCompte(ravito),
-
-        // Onglet consulte et edit temps
-        //OngletEditTemps(ravito),
-        
-        // Onglet consulte et edit actions
-        OngletEditAction(ravito),
-
-        // Onglet remarque
-        OngletRemarque(ravito),
-      ],
+              // Onglet CO
+              if (CO) OngletCO(),
+    
+              // Onglet compte dossard
+              SingleChildScrollView(child: OngletCompte(ravito)),
+    
+              // Onglet consulte et edit temps
+              SingleChildScrollView(
+                controller: editTempsScrollController,
+                child: OngletEditTemps(ravito, editTempsScrollController)
+              ),
+              
+              // Onglet consulte et edit actions
+              SingleChildScrollView(child: OngletEditAction(ravito)),
+    
+              // Onglet remarque
+              SingleChildScrollView(child: OngletRemarque(ravito)),
+            ],
+          ),
+        ),
+        if (isMobile) Divider(thickness: 1),
+      ]
     );
   }
 }

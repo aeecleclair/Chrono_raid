@@ -29,7 +29,7 @@ class OpenIdRepository extends Repository {
     try {
       final response = await http
           .post(
-            Uri.parse("${Repository.host}auth/token"),
+            Uri.parse("http://${Repository.host}:8000/auth/token"),
             headers: headers,
             body: body,
           )

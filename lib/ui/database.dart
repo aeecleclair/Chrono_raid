@@ -359,13 +359,25 @@ class DatabaseManager {
 
   Future<List<Temps>> getTempsbyDossard(String dossard, String ravito) async {
     final db = await instance.database;
-    final result = await db.rawQuery('''
-      SELECT *
-      FROM $tableTemps
-      WHERE ${TempsField.ravito} = '$ravito' AND ${TempsField.dossard} = '$dossard'
-      ORDER BY ${TempsField.date} ASC;
-    ''');
-    List<Temps> r = result.map((e) => Temps.fromJson(e)).toList();
+    
+    final result;
+    if (ravito != 'admin') {
+      result = await db.rawQuery('''
+        SELECT *
+        FROM $tableTemps
+        WHERE ${TempsField.ravito} = '$ravito' AND ${TempsField.dossard} = '$dossard'
+        ORDER BY ${TempsField.date} ASC;
+      ''');
+    } else {
+      result = await db.rawQuery('''
+        SELECT *
+        FROM $tableTemps
+        WHERE ${TempsField.dossard} = '$dossard'
+        ORDER BY ${TempsField.date} ASC;
+      ''');
+    }
+    final r = List<Temps>.from(result.map((e) => Temps.fromJson(e)));
+    
     return r;
   }
 

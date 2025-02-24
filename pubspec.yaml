@@ -8,6 +8,7 @@ environment:
   sdk: ^3.5.4
 
 dependencies:
+  app_links: ^6.3.3
   auto_size_text: ^3.0.0
   cupertino_icons: ^1.0.8
   datetime_picker_formfield: ^2.0.1

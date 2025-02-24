@@ -84,7 +84,7 @@ class OngletEditTemps extends HookWidget {
                         scrollDirection: Axis.horizontal,
                         child: Builder(
                           builder: (context) {
-                            double w = max(((epreuves[parcours].length + 2) * 120).toDouble(), MediaQuery.of(context).size.width);
+                            double w = max(((epreuves[parcours].length + 2) * (isMobile? 80 : 120)).toDouble(), MediaQuery.of(context).size.width);
                             return SizedBox(
                               width: w,
                               child: grid(epreuves[parcours], temps[parcours], isMobile, refresh, w),

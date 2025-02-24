@@ -134,7 +134,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                   controller: scrollController,
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
-                    width: (nb_cols * 200).toDouble(),
+                    width: (nb_cols * (isMobile? 150 : 200)).toDouble(),
                     height: 250,
                     child: GridView.builder(
                       shrinkWrap: true,
@@ -163,7 +163,6 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                             return ElevatedButton(
                               child: const Text("Remplacer"),
                               onPressed: () async {
-                                Navigator.of(context).pop();
                                 if (widget.date.isNotEmpty) {
                                   await dbm.editTemps(temps[colIndex], widget.date);
                                 } else {
@@ -181,13 +180,13 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                                   alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
                                 );
                                 widget.refresher.value = !widget.refresher.value;
+                                Navigator.of(context).pop();
                               },
                             );
                           } else if (widget.date.isEmpty && colIndex == nb_cols - 1) {
                             return ElevatedButton(
                               child: const Text("Ajouter"),
                               onPressed: () async {
-                                Navigator.of(context).pop();
                                 await dbm.createTemps(Temps(int.parse(widget.dossard), _selectedDate, parcours, widget.ravito));
                                 toastification.show(
                                   context: context,
@@ -201,6 +200,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                                   alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
                                 );
                                 widget.refresher.value = !widget.refresher.value;
+                                Navigator.of(context).pop();
                               },
                             );
                           } else {
@@ -211,7 +211,6 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                             return ElevatedButton(
                               child: const Text("Supprimer"),
                               onPressed: () async {
-                                Navigator.of(context).pop();
                                 await dbm.deleteTemps(temps[colIndex]);
                                 toastification.show(
                                   context: context,
@@ -225,6 +224,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                                   alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
                                 );
                                 widget.refresher.value = !widget.refresher.value;
+                                Navigator.of(context).pop();
                               },
                             );
                           } else {
@@ -251,8 +251,8 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                 }
               }()),
               onPressed: () {
-                Navigator.of(context).pop();
                 widget.refresher.value = !widget.refresher.value;
+                Navigator.of(context).pop();
               },
             ),
           ]

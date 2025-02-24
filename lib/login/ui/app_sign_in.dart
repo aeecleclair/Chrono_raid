@@ -71,6 +71,7 @@ class AppSignIn extends HookConsumerWidget {
                                 QR.to(pathForwarding.path);
                               },
                               error: (e, s) {
+                                print(e);
                                 displayToast(
                                   context,
                                   TypeMsg.error,
