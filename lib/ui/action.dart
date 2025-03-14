@@ -1,3 +1,4 @@
+import 'package:chrono_raid/ui/functions.dart';
 import 'package:uuid/uuid.dart';
 
 const String tableAction = "action";
@@ -17,7 +18,7 @@ class ActionField {
 
   // Le nom des colonnes dans la base de donnée
   static const String id = "id";
-  static const String type = "type";
+  static String type = actionTypeToString(ActionType.Default);
   static const String ravito = "ravito";
   static const String date = "date";
   static const String temps_id = "temps_id";
@@ -30,7 +31,7 @@ class ActionField {
 
 class Action {
   String id = "";
-  String type = "";
+  ActionType type = ActionType.Default;
   String ravito = "";
   String date = "";
   String temps_id = "";
@@ -39,7 +40,7 @@ class Action {
   String ancien_temps = "";
   String nouveau_temps = "";
 
-  Action(String Type, String Ravito, String Date, String Temps_id, String Parcours, String Dossard, String AncienTemps, String NouveauTemps, {String Id = ""}) {
+  Action(ActionType Type, String Ravito, String Date, String Temps_id, String Parcours, String Dossard, String AncienTemps, String NouveauTemps, {String Id = ""}) {
     id = Id.isEmpty ? Uuid().v4() : Id;
     type = Type;
     ravito = Ravito;
@@ -58,7 +59,7 @@ class Action {
 
   static Action fromJson(Map<String, Object?> json) =>
     Action(
-        json[ActionField.type] as String,
+        stringToActionType(json[ActionField.type] as String),
         json[ActionField.ravito] as String,
         json[ActionField.date] as String,
         json[ActionField.temps_id] as String,
@@ -72,7 +73,7 @@ class Action {
   Map<String, Object> toJson() =>
     {
       ActionField.id: id,
-      ActionField.type: type,
+      ActionField.type: actionTypeToString(type),
       ActionField.ravito: ravito,
       ActionField.date: date,
       ActionField.temps_id: temps_id,

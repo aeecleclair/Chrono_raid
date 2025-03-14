@@ -25,10 +25,22 @@ class OngletDossardUnique extends HookWidget {
       String dossard_str = controllerDossard.text;
       dossard.value = dossard_str;
       if (dossard_str != '' && await dbm.valideDossard(dossard_str)) {
-        controllerDossard.clear();
-        final String now = DateTime.now().toIso8601String();
-        final result = await dbm.createTemps(Temps(int.parse(dossard_str), now, await dbm.getParcoursByDossard(dossard_str), ravito));
-        if (result.toString() == 'Erreur') {
+          final String now = DateTime.now().toIso8601String();
+        try {
+          controllerDossard.clear();
+          await dbm.createTemps(Temps(int.parse(dossard_str), now, await dbm.getParcoursByDossard(dossard_str), ravito));
+          toastification.show(
+            context: context,
+            title: const Text('Temps ajouté !'),
+            autoCloseDuration: const Duration(seconds: 3),
+            primaryColor: Colors.black,
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.black,
+            icon: const Icon(Icons.check_circle_outlined),
+            closeOnClick: true,
+            alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+          );
+        } catch(e) {
           toastification.show(
             context: context,
             title: Container(
@@ -57,19 +69,6 @@ class OngletDossardUnique extends HookWidget {
               },
             ),
             showProgressBar: false,
-          );
-        }
-        else {
-          toastification.show(
-            context: context,
-            title: const Text('Temps ajouté !'),
-            autoCloseDuration: const Duration(seconds: 3),
-            primaryColor: Colors.black,
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.black,
-            icon: const Icon(Icons.check_circle_outlined),
-            closeOnClick: true,
-            alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
           );
         }
       }

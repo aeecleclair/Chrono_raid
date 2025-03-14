@@ -16,9 +16,9 @@ class OngletDossardGroupe extends HookWidget {
     final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
 
     void envoyer() async {
-      String date = DateTime.now().toIso8601String();
-      final result = (await dbm.createTempsGroupe(parcours.value, date, ravito)).toString();
-      if (result.isEmpty) {
+      try {
+        String date = DateTime.now().toIso8601String();
+        await dbm.createTempsGroupe(parcours.value, date, ravito);
         toastification.show(
           context: context,
           title: const Text('Temps ajoutés !'),
@@ -30,10 +30,10 @@ class OngletDossardGroupe extends HookWidget {
           closeOnClick: true,
           alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
         );
-      } else {
+      } catch(e) {
         toastification.show(
           context: context,
-          title: Text(result),
+          title: Text(e.toString()),
           autoCloseDuration: const Duration(seconds: 3),
           primaryColor: Colors.black,
           backgroundColor: Colors.red,

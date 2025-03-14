@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:chrono_raid/ui/functions.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -194,6 +192,7 @@ class DatabaseManager {
       Balise r = Balise.fromJson(result[0]);
       return r;
     }
+    return null;
   }
 
   Future<List<Balise>> getBalises() async {
@@ -216,7 +215,7 @@ class DatabaseManager {
     ''');
   }
 
-  Future<String> createTemps(Temps t) async {
+  Future<void> createTemps(Temps t) async {
     final nb_epreuves = ((await readJsonEpreuves(t.ravito))[t.parcours]!).length;
     final db = await instance.database;
     final result = await db.rawQuery('''
@@ -226,18 +225,15 @@ class DatabaseManager {
     ''');
     final int nb_temps = result[0]['c'] as int;
     if (nb_temps >= nb_epreuves) {
-      return 'Erreur'; //provisoire
+      throw Exception('Erreur : Nombre maximum de temps atteint');
     }
-    else {
-      final json = t.toJson();
-      await db.insert(tableTemps, json);
-      final a = Action('Départ simple', t.ravito, DateTime.now().toIso8601String(), t.id, t.parcours, t.dossard.toString(), '-', t.date).toJson();
-      await db.insert(tableAction, a);
-      return ''; //provisoire
-    }
+    final json = t.toJson();
+    await db.insert(tableTemps, json);
+    final a = Action(ActionType.DepartSimple, t.ravito, DateTime.now().toIso8601String(), t.id, t.parcours, t.dossard.toString(), '-', t.date).toJson();
+    await db.insert(tableAction, a);
   }
 
-  Future<String> createTempsGroupe(String parcours, String date, String ravito) async {
+  Future<void> createTempsGroupe(String parcours, String date, String ravito) async {
     final nb_epreuves = ((await readJsonEpreuves(ravito))[parcours]!).length;
     final dossards = (await getEquipes(parcours)).map((equ) => equ.dossard).toList();
     final db = await instance.database;
@@ -253,11 +249,11 @@ class DatabaseManager {
       if (nb_temps_ref == -1) {
         nb_temps_ref = nb_temps;
       } else if (nb_temps != nb_temps_ref){
-        return "Erreur : lignes remplies inégalement"; //provisoire
+        throw Exception('Erreur : lignes remplies inégalement');
       }
     }
     if (nb_temps_ref >= nb_epreuves) {
-      return 'Erreur : lignes pleines'; //provisoire
+      throw Exception('Erreur : lignes pleines');
     }
     String temps_ids = "";
     for (var d in dossards) {
@@ -266,14 +262,13 @@ class DatabaseManager {
       await db.insert(tableTemps, json);
       temps_ids += '${t.id}/';
     }
-    final a = Action('Départ groupé', ravito, DateTime.now().toIso8601String(), temps_ids, parcours, '-', '-', date).toJson();
+    final a = Action(ActionType.DepartGroupe, ravito, DateTime.now().toIso8601String(), temps_ids, parcours, '-', '-', date).toJson();
     await db.insert(tableAction, a);
-    return ''; //provisoire
   }
 
   Future editTemps(Temps t, String date) async {
     final db = await instance.database;
-    final a = Action('Edit', t.ravito, DateTime.now().toIso8601String(), t.id, t.parcours, t.dossard.toString(), t.date, date).toJson();
+    final a = Action(ActionType.Edit, t.ravito, DateTime.now().toIso8601String(), t.id, t.parcours, t.dossard.toString(), t.date, date).toJson();
     await db.insert(tableAction, a);
     await db.execute('''
       UPDATE $tableTemps
@@ -288,7 +283,7 @@ class DatabaseManager {
       DELETE FROM $tableTemps
       WHERE ${TempsField.id} = '${t.id}'
     ''');
-    final a = Action('Delete', t.ravito, DateTime.now().toIso8601String(), t.id, t.parcours, t.dossard.toString(), t.date, '-').toJson();
+    final a = Action(ActionType.Delete, t.ravito, DateTime.now().toIso8601String(), t.id, t.parcours, t.dossard.toString(), t.date, '-').toJson();
     await db.insert(tableAction, a);
   }
 
@@ -323,14 +318,14 @@ class DatabaseManager {
     '''))[0];
     final action = Action.fromJson(result);
     switch(action.type) {
-      case 'Départ simple':
+      case ActionType.DepartSimple:
         await db.execute('''
           DELETE FROM $tableTemps
           WHERE ${TempsField.id} = '${action.temps_id}'
         ''');
         break;
       
-      case 'Départ groupé':
+      case ActionType.DepartGroupe:
         final List ids = action.temps_id.split('/');
         final String string_id = "(${ids.map((e) => "'$e'").join(',')})";
         await db.execute('''
@@ -338,18 +333,20 @@ class DatabaseManager {
           WHERE ${TempsField.id} IN $string_id
         ''');
 
-      case 'Delete':
+      case ActionType.Delete:
         final t = Temps(int.parse(action.dossard), action.ancien_temps, action.parcours, action.ravito, Id: action.temps_id);
         final json = t.toJson();
         await db.insert(tableTemps, json);
         
-      case 'Edit':
+      case ActionType.Edit:
         await db.execute('''
           UPDATE $tableTemps
           SET ${TempsField.date} = '${action.ancien_temps}'
           WHERE ${TempsField.id} = '${action.temps_id}'
         ''');
 
+      case ActionType.Default:
+        throw Exception('Action non définie');
     }
     await db.execute('''
       DELETE FROM $tableAction

@@ -187,20 +187,34 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                             return ElevatedButton(
                               child: const Text("Ajouter"),
                               onPressed: () async {
-                                await dbm.createTemps(Temps(int.parse(widget.dossard), _selectedDate, parcours, widget.ravito));
-                                toastification.show(
-                                  context: context,
-                                  title: const Text('Temps ajouté !'),
-                                  autoCloseDuration: const Duration(seconds: 3),
-                                  primaryColor: Colors.black,
-                                  backgroundColor: Colors.green,
-                                  foregroundColor: Colors.black,
-                                  icon: const Icon(Icons.check_circle_outlined),
-                                  closeOnClick: true,
-                                  alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
-                                );
-                                widget.refresher.value = !widget.refresher.value;
-                                Navigator.of(context).pop();
+                                try {
+                                  await dbm.createTemps(Temps(int.parse(widget.dossard), _selectedDate, parcours, widget.ravito));
+                                  toastification.show(
+                                    context: context,
+                                    title: const Text('Temps ajouté !'),
+                                    autoCloseDuration: const Duration(seconds: 3),
+                                    primaryColor: Colors.black,
+                                    backgroundColor: Colors.green,
+                                    foregroundColor: Colors.black,
+                                    icon: const Icon(Icons.check_circle_outlined),
+                                    closeOnClick: true,
+                                    alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+                                  );
+                                  widget.refresher.value = !widget.refresher.value;
+                                  Navigator.of(context).pop();
+                                } catch(e) {
+                                  toastification.show(
+                                    context: context,
+                                    title: Text(e.toString()),
+                                    autoCloseDuration: const Duration(seconds: 3),
+                                    primaryColor: Colors.black,
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.black,
+                                    icon: const Icon(Icons.cancel_outlined),
+                                    closeOnClick: true,
+                                    alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+                                  );
+                                }
                               },
                             );
                           } else {

@@ -80,3 +80,27 @@ Future<bool> isCO(ravito) async{
   final bool value = data as bool;
   return value;
 }
+
+enum ActionType {
+  Default,
+  DepartSimple,
+  DepartGroupe,
+  Delete,
+  Edit,
+}
+
+final Map<ActionType, String> actionTypeToStringMap = {
+  for (var at in ActionType.values) at: at.toString().split('.').last
+};
+
+final Map<String, ActionType> stringToActionTypeMap = {
+  for (var at in ActionType.values) at.toString().split('.').last: at
+};
+
+String actionTypeToString(ActionType at) {
+  return actionTypeToStringMap[at] ?? 'Default';
+}
+
+ActionType stringToActionType(String at) {
+  return stringToActionTypeMap[at] ?? ActionType.Default;
+}
