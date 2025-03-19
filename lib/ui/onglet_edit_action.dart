@@ -11,7 +11,6 @@ class OngletEditAction extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
     final dbm = DatabaseManager();
     final refresh = useState(false);
 

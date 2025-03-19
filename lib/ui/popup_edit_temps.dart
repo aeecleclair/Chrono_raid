@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:chrono_raid/ui/functions.dart';
-import 'package:flutter/foundation.dart';
+import 'package:chrono_raid/tools/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:toastification/toastification.dart';
@@ -39,7 +39,6 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
   Widget build(BuildContext context) {
     final dbm = DatabaseManager();
     final scrollController = ScrollController();
-    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
 
     return FutureBuilder<List<Object>>(
       future: Future.wait([
@@ -134,7 +133,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                   controller: scrollController,
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
-                    width: (nb_cols * (isMobile? 150 : 200)).toDouble(),
+                    width: (nb_cols * (kIsMobile? 150 : 200)).toDouble(),
                     height: 250,
                     child: GridView.builder(
                       shrinkWrap: true,
@@ -177,7 +176,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                                   foregroundColor: Colors.black,
                                   icon: const Icon(Icons.check_circle_outlined),
                                   closeOnClick: true,
-                                  alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+                                  alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
                                 );
                                 widget.refresher.value = !widget.refresher.value;
                                 Navigator.of(context).pop();
@@ -198,7 +197,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                                     foregroundColor: Colors.black,
                                     icon: const Icon(Icons.check_circle_outlined),
                                     closeOnClick: true,
-                                    alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+                                    alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
                                   );
                                   widget.refresher.value = !widget.refresher.value;
                                   Navigator.of(context).pop();
@@ -212,7 +211,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                                     foregroundColor: Colors.black,
                                     icon: const Icon(Icons.cancel_outlined),
                                     closeOnClick: true,
-                                    alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+                                    alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
                                   );
                                 }
                               },
@@ -235,7 +234,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                                   foregroundColor: Colors.black,
                                   icon: const Icon(Icons.check_circle_outlined),
                                   closeOnClick: true,
-                                  alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+                                  alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
                                 );
                                 widget.refresher.value = !widget.refresher.value;
                                 Navigator.of(context).pop();

@@ -1,5 +1,5 @@
 import 'package:chrono_raid/ui/database.dart';
-import 'package:flutter/foundation.dart';
+import 'package:chrono_raid/tools/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -17,7 +17,6 @@ class OngletCO extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final dbm = DatabaseManager();
-    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
     
     void envoyer() async {
       String dossard_str = controllerDossard.text;
@@ -83,7 +82,7 @@ class OngletCO extends HookWidget {
               foregroundColor: Colors.black,
               icon: const Icon(Icons.check_circle_outlined),
               closeOnClick: true,
-              alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+              alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
             );
           }
         } else {
@@ -96,7 +95,7 @@ class OngletCO extends HookWidget {
             foregroundColor: Colors.black,
             icon: const Icon(Icons.cancel_outlined),
             closeOnClick: true,
-            alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+            alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
           );
         }
       }
@@ -110,7 +109,7 @@ class OngletCO extends HookWidget {
           foregroundColor: Colors.black,
           icon: const Icon(Icons.cancel_outlined),
           closeOnClick: true,
-          alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+          alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
         );
       }
     }

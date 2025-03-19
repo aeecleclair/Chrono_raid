@@ -7,11 +7,11 @@ import 'package:chrono_raid/tools/repository/repository.dart';
 import 'package:chrono_raid/tools/repository/temps_repository.dart';
 import 'package:chrono_raid/ui/database.dart';
 import 'package:chrono_raid/ui/temps.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:chrono_raid/tools/constants.dart';
 
 Future<List<Map<String,String>>> readJsonEquipes() async {
   final String response = await rootBundle.loadString('assets/Equipes.json');
@@ -89,8 +89,7 @@ String dateToFormat(String date) {
     return '-';
   }
   else {
-    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
-    return isMobile ? DateFormat('dd/MM\nH:m:s').format(DateTime.parse(date)) : DateFormat('dd/MM - H:m:s').format(DateTime.parse(date));
+    return kIsMobile ? DateFormat('dd/MM\nH:m:s').format(DateTime.parse(date)) : DateFormat('dd/MM - H:m:s').format(DateTime.parse(date));
   }
 }
 

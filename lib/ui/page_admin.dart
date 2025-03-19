@@ -5,7 +5,7 @@ import 'package:chrono_raid/ui/onglet_compte.dart';
 import 'package:chrono_raid/ui/onglet_consulte_remarque.dart';
 import 'package:chrono_raid/ui/onglet_edit_temps.dart';
 import 'package:chrono_raid/ui/onglet_temps_manquants.dart';
-import 'package:flutter/foundation.dart';
+import 'package:chrono_raid/tools/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,7 +27,6 @@ class _MainPageState extends State<PageAdmin> {
   Widget build(BuildContext context) {
     final lastSynchroDate = widget.ref.watch(lastSynchroDateProvider);
     final lastSynchroDateNotifier = widget.ref.watch(lastSynchroDateProvider.notifier);
-    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
     return MaterialApp(
       home: DefaultTabController(
         length: 5,
@@ -55,19 +54,19 @@ class _MainPageState extends State<PageAdmin> {
               ),
           ),
           body: Scaffold(
-            appBar: isMobile ? null : AppBar(
+            appBar: kIsMobile ? null : AppBar(
               title: null,
-              bottom: buildTabs(isMobile),
+              bottom: buildTabs(kIsMobile),
             ),
-            body: buildTabsContent(isMobile, widget.ref),
-            bottomNavigationBar: isMobile ? buildTabs(isMobile) : null,
+            body: buildTabsContent(kIsMobile, widget.ref),
+            bottomNavigationBar: kIsMobile ? buildTabs(kIsMobile) : null,
           ),
         ),
       ),
     );
   }
 
-  PreferredSizeWidget buildTabs(bool isMobile) {
+  PreferredSizeWidget buildTabs(bool kIsMobile) {
     return TabBar(
       tabs:[
         for (final tab in [
@@ -97,8 +96,8 @@ class _MainPageState extends State<PageAdmin> {
     );
   }
 
-  Widget buildTabsContent(bool isMobile, WidgetRef ref) {
-    if (isMobile) {
+  Widget buildTabsContent(bool kIsMobile, WidgetRef ref) {
+    if (kIsMobile) {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         body: Column(

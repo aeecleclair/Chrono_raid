@@ -1,7 +1,7 @@
 import 'package:chrono_raid/ui/database.dart';
 import 'package:chrono_raid/ui/popup_edit_temps.dart';
 import 'package:chrono_raid/ui/temps.dart';
-import 'package:flutter/foundation.dart';
+import 'package:chrono_raid/tools/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -19,7 +19,6 @@ class OngletDossardUnique extends HookWidget {
     final focusNode = useFocusNode();
     final focusNode2 = useFocusNode();
     final dbm = DatabaseManager();
-    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
     
     void envoyer() async {
       String dossard_str = controllerDossard.text;
@@ -38,7 +37,7 @@ class OngletDossardUnique extends HookWidget {
             foregroundColor: Colors.black,
             icon: const Icon(Icons.check_circle_outlined),
             closeOnClick: true,
-            alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+            alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
           );
         } catch(e) {
           toastification.show(
@@ -62,7 +61,7 @@ class OngletDossardUnique extends HookWidget {
             foregroundColor: Colors.black,
             icon: const Icon(Icons.cancel_outlined),
             closeOnClick: true,
-            alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+            alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
             callbacks: ToastificationCallbacks(
               onTap: (toastItem) {
                 showDialog(context: context, barrierDismissible: false, builder: (BuildContext context) {return PopupEditTemps(dossard: dossard_str, ravito: ravito, date: now);});
@@ -82,7 +81,7 @@ class OngletDossardUnique extends HookWidget {
           foregroundColor: Colors.black,
           icon: const Icon(Icons.cancel_outlined),
           closeOnClick: true,
-          alignment: isMobile ? Alignment.topLeft : Alignment.bottomRight,
+          alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
         );
       }
     }

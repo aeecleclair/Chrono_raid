@@ -1,7 +1,7 @@
 import 'package:chrono_raid/auth/providers/openid_provider.dart';
 import 'package:chrono_raid/login/ui/app_sign_in.dart';
+import 'package:chrono_raid/tools/constants.dart';
 import 'package:chrono_raid/tools/providers/last_syncro_date_provider.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -116,8 +116,6 @@ class MainPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
-
     final lastSynchroDate = ref.watch(lastSynchroDateProvider);
     final lastSynchroDateNotifier = ref.watch(lastSynchroDateProvider.notifier);
     if (ravito == 'Admin') {
@@ -135,7 +133,7 @@ class MainPage extends HookConsumerWidget {
         final CO = snapshot.data!;
         return MaterialApp(
           home: DefaultTabController(
-            length: (isMobile? 5 : 6) + (CO? 1 : 0),
+            length: (kIsMobile? 5 : 6) + (CO? 1 : 0),
             child: Scaffold(
               resizeToAvoidBottomInset: false,
               appBar: AppBar(
@@ -162,12 +160,12 @@ class MainPage extends HookConsumerWidget {
               ),
               body: Scaffold(
                 resizeToAvoidBottomInset: false,
-                appBar: isMobile ? null : AppBar(
+                appBar: kIsMobile ? null : AppBar(
                   title: null,
-                  bottom: buildTabs(isMobile, CO),
+                  bottom: buildTabs(CO),
                 ),
-                body: buildTabsContent(isMobile, CO, ravito),
-                bottomNavigationBar: isMobile ? buildTabs(isMobile, CO) : null,
+                body: buildTabsContent(CO, ravito),
+                bottomNavigationBar: kIsMobile ? buildTabs(CO) : null,
               ),
             ),
           ),
@@ -176,11 +174,11 @@ class MainPage extends HookConsumerWidget {
     );
   }
 
-  PreferredSizeWidget buildTabs(bool isMobile, bool CO) {
+  PreferredSizeWidget buildTabs(bool CO) {
     return TabBar(
       tabs:[
         for (final tab in [
-          if (isMobile) ...[
+          if (kIsMobile) ...[
             {'icon': Icons.person, 'text': 'Départ'},
           ] else ...[
             {'icon': Icons.person, 'text': 'Départ simple'},
@@ -214,7 +212,7 @@ class MainPage extends HookConsumerWidget {
     );
   }
 
-  Widget buildTabsContent(bool isMobile, bool CO, String ravito) {
+  Widget buildTabsContent(bool CO, String ravito) {
     final editTempsScrollController = ScrollController();
     return Column(
       children: [
@@ -222,7 +220,7 @@ class MainPage extends HookConsumerWidget {
           child: TabBarView(
             physics: NeverScrollableScrollPhysics(),
             children: [
-              if (isMobile) ...[
+              if (kIsMobile) ...[
                 // Onglet fusionné dossard unique et groupe
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -260,7 +258,7 @@ class MainPage extends HookConsumerWidget {
             ],
           ),
         ),
-        if (isMobile) Divider(thickness: 1),
+        if (kIsMobile) Divider(thickness: 1),
       ]
     );
   }

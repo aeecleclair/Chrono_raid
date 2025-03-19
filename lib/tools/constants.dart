@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ColorConstants {
@@ -30,3 +31,9 @@ const String studentRegex = r'^[\w\-.]*@etu(-enise)?.ec-lyon.fr$';
 const String unableToOpen = 'Impossible d\'ouvrir le lien';
 
 const int maxHyperionFileSize = 4194304;
+
+final bool kIsDesktop = defaultTargetPlatform == TargetPlatform.windows ||
+    defaultTargetPlatform == TargetPlatform.linux ||
+    defaultTargetPlatform == TargetPlatform.macOS;
+final bool kIsMobile = defaultTargetPlatform == TargetPlatform.android || 
+    defaultTargetPlatform == TargetPlatform.iOS;

@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:chrono_raid/ui/popup_edit_temps.dart';
-import 'package:flutter/foundation.dart';
+import 'package:chrono_raid/tools/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -17,7 +17,6 @@ class OngletEditTemps extends HookWidget {
   Widget build(BuildContext context) {
     final dbm = DatabaseManager();
     final refresh = useState(false);
-    final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
     final dropdown = useState<Map<String, bool>?>(null);
 
     return FutureBuilder<List<String>>(
@@ -93,10 +92,10 @@ class OngletEditTemps extends HookWidget {
                         scrollDirection: Axis.horizontal,
                         child: Builder(
                           builder: (context) {
-                            double w = max(((epreuves[parcours].length + 2) * (isMobile ? 80 : 120)).toDouble(), MediaQuery.of(context).size.width);
+                            double w = max(((epreuves[parcours].length + 2) * (kIsMobile ? 80 : 120)).toDouble(), MediaQuery.of(context).size.width);
                             return SizedBox(
                               width: w,
-                              child: grid(epreuves[parcours], temps[parcours], isMobile, refresh, w),
+                              child: grid(epreuves[parcours], temps[parcours], kIsMobile, refresh, w),
                             );
                           },
                         ),
@@ -112,7 +111,7 @@ class OngletEditTemps extends HookWidget {
     );
   }
 
-  Widget grid(epreuves, temps, isMobile, refresh, w) {
+  Widget grid(epreuves, temps, kIsMobile, refresh, w) {
     return GridView.builder(
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -141,7 +140,7 @@ class OngletEditTemps extends HookWidget {
               } else if (index <= epreuves.length) {
                 return Center(
                   child: Text(
-                    isMobile? epreuves[index - 1].replaceFirst(' ', '\n') : epreuves[index - 1],
+                    kIsMobile? epreuves[index - 1].replaceFirst(' ', '\n') : epreuves[index - 1],
                     style: const TextStyle(fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
