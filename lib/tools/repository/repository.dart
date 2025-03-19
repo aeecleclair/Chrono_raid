@@ -7,7 +7,7 @@ import 'package:chrono_raid/tools/cache/cache_manager.dart';
 import 'package:chrono_raid/tools/exception.dart';
 
 abstract class Repository {
-  static const String host = "localhost";//"hyperion.dev.eclair.ec-lyon.fr";
+  static const String host = "http://172.20.10.2:8000/";//"hyperion.dev.eclair.ec-lyon.fr";
   static const String expiredTokenDetail = "Could not validate credentials";
   final String ext = "";
   final Map<String, String> headers = {
@@ -27,7 +27,7 @@ abstract class Repository {
   Future<List> getList({String suffix = ""}) async {
     try {
       final response =
-          await http.get(Uri.parse("http://$host:8000" + ext + suffix), headers: headers);
+          await http.get(Uri.parse(host + ext + suffix), headers: headers);
       if (response.statusCode == 200) {
         try {
           String toDecode = response.body;
@@ -81,7 +81,7 @@ abstract class Repository {
   }) async {
     try {
       final response =
-          await http.get(Uri.parse("http://$host:8000" + ext + id + suffix), headers: headers);
+          await http.get(Uri.parse(host + ext + id + suffix), headers: headers);
       if (response.statusCode == 200) {
         try {
           String toDecode = response.body;
@@ -130,7 +130,7 @@ abstract class Repository {
   /// POST ext/suffix
   Future<dynamic> create(dynamic t, {String suffix = ""}) async {
     final response = await http.post(
-      Uri.parse("http://$host:8000" + ext + suffix),
+      Uri.parse(host + ext + suffix),
       headers: headers,
       body: jsonEncode(t),
     );
@@ -162,7 +162,7 @@ abstract class Repository {
   /// PATCH ext/id/suffix
   Future<bool> update(dynamic t, String tId, {String suffix = ""}) async {
     final response = await http.patch(
-      Uri.parse("http://$host:8000" + ext + tId + suffix),
+      Uri.parse(host + ext + tId + suffix),
       headers: headers,
       body: jsonEncode(t),
     );
@@ -185,7 +185,7 @@ abstract class Repository {
   /// DELETE ext/id/suffix
   Future<bool> delete(String tId, {String suffix = ""}) async {
     final response = await http.delete(
-      Uri.parse("http://$host:8000" + ext + tId + suffix),
+      Uri.parse(host + ext + tId + suffix),
       headers: headers,
     );
     if (response.statusCode == 204) {

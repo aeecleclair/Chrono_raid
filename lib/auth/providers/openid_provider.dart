@@ -115,13 +115,14 @@ class OpenIdTokenProvider
   final OpenIdRepository openIdRepository = OpenIdRepository();
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   final String tokenName = "my_ecl_auth_token";
-  final String clientId = "Titan";
+  final String clientId = "ChronoRaid";
   final String tokenKey = "token";
   final String refreshTokenKey = "refresh_token";
   final List<String> scopes = ["API"];
   final FlutterAppAuth appAuth = const FlutterAppAuth();
   final String redirectUrl = "<<>>://authorized";   // TODO :
-  final String redirectUrlHost = "localhost"; //"myecl.fr";
+  final String redirectUrlHost = InternetAddress.loopbackIPv4.address;
+  final int redirectUrlPort = 8001;
   final String discoveryUrl =
       "${Repository.host}.well-known/openid-configuration";
   OpenIdTokenProvider() : super(const AsyncValue.loading());
@@ -132,10 +133,6 @@ class OpenIdTokenProvider
         'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
     return List.generate(len, (index) => chars[r.nextInt(chars.length)]).join();
   }
-
-  // String hash(String data) {
-  //   return base64.encode(sha256.convert(utf8.encode(data)).bytes);
-  // }
 
   String hash(String codeVerifier) {
     var bytes = utf8.encode(codeVerifier);
@@ -149,28 +146,18 @@ class OpenIdTokenProvider
         final redirectUri = Uri(
           scheme: "http",
           host: redirectUrlHost,
-          port: 8001, //pour les tests en local
+          port: redirectUrlPort,
           path: "/static.html",
         );
         final codeVerifier = generateRandomString(128);
         final codeChallenge = hash(codeVerifier);
 
-        startLocalServer(redirectUri.toString(), codeVerifier);
+        startLocalServer(redirectUri.toString(), redirectUrlHost, redirectUrlPort, codeVerifier);
+        print(redirectUri.toString());
 
-        final Uri monUrl = Uri(
-          scheme: 'http',
-          host: Repository.host,
-          port: 8000, //pour les tests en local
-          path: "/auth/authorize",
-          queryParameters: {
-            'client_id': clientId,
-            'response_type': 'code',
-            'scope': scopes.join(" "),
-            'redirect_uri': redirectUri.toString(),
-            'code_challenge': codeChallenge,
-            'code_challenge_method': 'S256',
-          },
-        );
+        final Uri monUrl = Uri.parse("${Repository.host}auth/authorize?client_id=$clientId&response_type=code&scope=API&redirect_uri=http://$redirectUrlHost:$redirectUrlPort/static.html&code_challenge=$codeChallenge&code_challenge_method=S256");
+
+        print(monUrl.toString());
         
         if (await canLaunchUrl(monUrl)) {
           await launchUrl(monUrl, mode: LaunchMode.externalApplication);
@@ -199,9 +186,9 @@ class OpenIdTokenProvider
     }
   }
 
-  void startLocalServer(String redirectUri, String codeVerifier) async {
-    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8001);
-    print("Serveur local démarré : http://127.0.0.1:8001");
+  void startLocalServer(String redirectUri, String redirectUrlHost, int redirectUrlPort, String codeVerifier) async {
+    final server = await HttpServer.bind(InternetAddress(redirectUrlHost), redirectUrlPort);
+    print("Serveur local démarré : $redirectUrlHost:$redirectUrlPort");
 
     await for (HttpRequest request in server) {
       final uri = request.uri;
