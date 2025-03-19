@@ -99,7 +99,7 @@ class OngletEditAction extends HookWidget {
             
                   final cellData = [
                     dateToFormat(action.date),
-                    action.type,
+                    actionTypeToString(action.type),
                     action.parcours,
                     action.dossard,
                     dateToFormat(action.ancien_temps),

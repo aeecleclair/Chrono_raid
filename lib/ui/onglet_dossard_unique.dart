@@ -28,7 +28,7 @@ class OngletDossardUnique extends HookWidget {
           final String now = DateTime.now().toIso8601String();
         try {
           controllerDossard.clear();
-          await dbm.createTemps(Temps(int.parse(dossard_str), now, await dbm.getParcoursByDossard(dossard_str), ravito));
+          await dbm.createTemps(Temps(int.parse(dossard_str), now, await dbm.getParcoursByDossard(dossard_str), ravito, true, now));
           toastification.show(
             context: context,
             title: const Text('Temps ajouté !'),

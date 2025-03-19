@@ -1,22 +1,22 @@
-import 'dart:io';
-
 import 'package:chrono_raid/auth/providers/openid_provider.dart';
 import 'package:chrono_raid/login/ui/app_sign_in.dart';
-import 'package:chrono_raid/ui/onglet_CO.dart';
-import 'package:chrono_raid/ui/functions.dart';
-import 'package:chrono_raid/ui/onglet_edit_action.dart';
-import 'package:chrono_raid/ui/page_admin.dart';
+import 'package:chrono_raid/tools/providers/last_syncro_date_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'ui/onglet_dossard_unique.dart';
 import 'ui/onglet_dossard_groupe.dart';
 import 'ui/onglet_compte.dart';
 import 'ui/onglet_edit_temps.dart';
 import 'ui/onglet_remarque.dart';
+import 'ui/onglet_CO.dart';
+import 'ui/functions.dart';
+import 'ui/onglet_edit_action.dart';
+import 'ui/page_admin.dart';
 
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +53,8 @@ class HomePage extends ConsumerWidget {
     if (token.isEmpty) {
       return AppSignIn();
     }
+    final lastSynchroDate = ref.watch(lastSynchroDateProvider);
+    final lastSynchroDateNotifier = ref.watch(lastSynchroDateProvider.notifier);
     return FutureBuilder<List<String>>(
       future: getRavitos(),
       builder: (context, snapshot) {
@@ -69,10 +71,19 @@ class HomePage extends ConsumerWidget {
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
-            title: const Row(
+            title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: [Text('Page d\'Accueil'), Icon(Icons.sync)]
+              children: [
+                Text('Page d\'Accueil'),
+                IconButton(
+                  onPressed: () {
+                    synchronisation(lastSynchroDate);
+                    lastSynchroDateNotifier.editDate(DateTime.now().toIso8601String());
+                  }, 
+                  icon:const Icon(Icons.sync)
+                ),
+              ]
             ),
           ),
           body: Center(
@@ -99,25 +110,22 @@ class HomePage extends ConsumerWidget {
   }
 }
 
-class MainPage extends StatefulWidget {
+class MainPage extends HookConsumerWidget {
   final String ravito;
   const MainPage(this.ravito, {super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
 
-    if (widget.ravito == 'Admin') {
-      return PageAdmin();
+    final lastSynchroDate = ref.watch(lastSynchroDateProvider);
+    final lastSynchroDateNotifier = ref.watch(lastSynchroDateProvider.notifier);
+    if (ravito == 'Admin') {
+      return PageAdmin(ref: ref);
     }
 
     return FutureBuilder(
-      future: isCO(widget.ravito),
+      future: isCO(ravito),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -141,9 +149,12 @@ class _MainPageState extends State<MainPage> {
                         }, 
                         icon:const Icon(Icons.arrow_back)
                       ),
-                      Text(widget.ravito),
+                      Text(ravito),
                       IconButton(
-                        onPressed: () {}, 
+                        onPressed: () {
+                          synchronisation(lastSynchroDate);
+                          lastSynchroDateNotifier.editDate(DateTime.now().toIso8601String());
+                        }, 
                         icon:const Icon(Icons.sync)
                       ),
                     ],
@@ -155,7 +166,7 @@ class _MainPageState extends State<MainPage> {
                   title: null,
                   bottom: buildTabs(isMobile, CO),
                 ),
-                body: buildTabsContent(isMobile, CO, widget.ravito),
+                body: buildTabsContent(isMobile, CO, ravito),
                 bottomNavigationBar: isMobile ? buildTabs(isMobile, CO) : null,
               ),
             ),

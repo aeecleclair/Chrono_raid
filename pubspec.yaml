@@ -31,6 +31,7 @@ dependencies:
   package_info_plus: ^8.1.2
   path: ^1.8.0
   path_provider_android: ^2.0.15
+  permission_handler: ^11.4.0
   qlevar_router: ^1.12.0
   shared_preferences: ^2.3.5
   smooth_page_indicator: ^1.2.0+3

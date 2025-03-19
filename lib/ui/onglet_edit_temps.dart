@@ -18,65 +18,74 @@ class OngletEditTemps extends HookWidget {
     final dbm = DatabaseManager();
     final refresh = useState(false);
     final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
-    final dropdown = useState({"Expert":true, "Sportif":true, "Découverte":true});
-    final scrollController = {"Expert": ScrollController(), "Sportif": ScrollController(), "Découverte": ScrollController()};
-    //final pageScrollController = ScrollController();
+    final dropdown = useState<Map<String, bool>?>(null);
 
-    return FutureBuilder<List<Object>>(
-      future: Future.wait([
-        dbm.getTempsOrderedbyDossard(ravito),
-        readJsonEpreuves(ravito),
-      ]),
+    return FutureBuilder<List<String>>(
+      future: getParcours(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Erreur: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('Aucune donnée disponible'));
         }
-        final data = snapshot.data as List;
-        final temps = data[0];
-        final epreuves = data[1];
+        if (snapshot.hasError) {
+          return Center(child: Text('Erreur: ${snapshot.error}'));
+        }
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('Aucun parcours disponible'));
+        }
 
-        return Column(
-          children: [
-            for (var parcours in ["Expert", "Sportif", "Découverte"]) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    parcours,
-                    style: const TextStyle(
-                      fontSize: 30,
-                      decoration: TextDecoration.underline,
-                    ),
+        final list_parcours = snapshot.data!;
+
+        if (dropdown.value == null && list_parcours.isNotEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            dropdown.value = {for (var parcours in list_parcours) parcours: true};
+          });
+        }
+ 
+        final scrollController = {for (var parcours in list_parcours) parcours: ScrollController()};
+        
+        return FutureBuilder<List<Object>>(
+          future: Future.wait([
+            dbm.getTempsOrderedbyDossard(ravito),
+            readJsonEpreuves(ravito),
+          ]),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Erreur: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('Aucune donnée disponible'));
+            }
+            
+            final data = snapshot.data as List;
+            final temps = data[0] as Map<String, dynamic>;
+            final epreuves = data[1] as Map<String, dynamic>;
+            
+            return Column(
+              children: [
+                for (var parcours in list_parcours) ...[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        parcours,
+                        style: const TextStyle(
+                          fontSize: 30,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          dropdown.value![parcours] = !dropdown.value![parcours]!;
+                          refresh.value = !refresh.value;
+                        },
+                        child: dropdown.value![parcours]! ? const Icon(Icons.keyboard_arrow_up) : const Icon(Icons.keyboard_arrow_down),
+                      ),
+                    ],
                   ),
-                  TextButton(
-                    onPressed: () {
-                      dropdown.value[parcours] = !dropdown.value[parcours]!;
-                      refresh.value = !refresh.value;
-                    },
-                    child: dropdown.value[parcours]! ? Icon(Icons.keyboard_arrow_up) : Icon(Icons.keyboard_arrow_down),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              if (temps[parcours] != null && dropdown.value[parcours]!)
-                NotificationListener<OverscrollNotification>(
-                  onNotification: (OverscrollNotification notification) {
-                    if (notification.metrics.axis == Axis.vertical) {
-                      pageScrollController.position
-                          .moveTo(pageScrollController.position.pixels + notification.overscroll);
-                    }
-                    return true;
-                  },
-                  child: NotificationListener<OverscrollIndicatorNotification>(
-                    onNotification: (OverscrollIndicatorNotification notification) {
-                      notification.disallowIndicator();
-                      return true;
-                    },
-                    child: Scrollbar(
+                  const SizedBox(height: 10),
+                  if (temps[parcours] != null && dropdown.value![parcours]!)
+                    Scrollbar(
                       controller: scrollController[parcours],
                       thumbVisibility: true,
                       child: SingleChildScrollView(
@@ -84,20 +93,20 @@ class OngletEditTemps extends HookWidget {
                         scrollDirection: Axis.horizontal,
                         child: Builder(
                           builder: (context) {
-                            double w = max(((epreuves[parcours].length + 2) * (isMobile? 80 : 120)).toDouble(), MediaQuery.of(context).size.width);
+                            double w = max(((epreuves[parcours].length + 2) * (isMobile ? 80 : 120)).toDouble(), MediaQuery.of(context).size.width);
                             return SizedBox(
                               width: w,
                               child: grid(epreuves[parcours], temps[parcours], isMobile, refresh, w),
                             );
-                          }
+                          },
                         ),
                       ),
                     ),
-                  ),
-                ),
-              const SizedBox(height: 10),
-            ],
-          ],
+                  const SizedBox(height: 10),
+                ],
+              ],
+            );
+          },
         );
       },
     );

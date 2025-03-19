@@ -153,13 +153,13 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                         if (rowIndex == 0) {
                           return Text(epreuves[index], textAlign: TextAlign.center,);
                         } else if (rowIndex == 1){
-                          if (colIndex < nb_cols - 1) {
+                          if (colIndex < nb_cols - 1 || (colIndex == nb_cols - 1 && nb_cols == epreuves.length)) {
                             return Text(dateToFormat(temps[colIndex].date), textAlign: TextAlign.center,);
                           } else {
                             return Text('-', textAlign: TextAlign.center,);
                           }
                         } else if (rowIndex == 2) {
-                          if (colIndex < nb_cols - 1) {
+                          if (colIndex < nb_cols - 1 || (colIndex == nb_cols - 1 && nb_cols == epreuves.length)) {
                             return ElevatedButton(
                               child: const Text("Remplacer"),
                               onPressed: () async {
@@ -188,7 +188,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                               child: const Text("Ajouter"),
                               onPressed: () async {
                                 try {
-                                  await dbm.createTemps(Temps(int.parse(widget.dossard), _selectedDate, parcours, widget.ravito));
+                                  await dbm.createTemps(Temps(int.parse(widget.dossard), _selectedDate, parcours, widget.ravito, true, DateTime.now().toIso8601String()));
                                   toastification.show(
                                     context: context,
                                     title: const Text('Temps ajouté !'),
@@ -221,7 +221,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                             return Container();
                           }
                         } else if (rowIndex == 3) {
-                          if (widget.date.isEmpty && colIndex < nb_cols - 1) {
+                          if (widget.date.isEmpty && (colIndex < nb_cols - 1 || (colIndex == nb_cols - 1 && nb_cols == epreuves.length))) {
                             return ElevatedButton(
                               child: const Text("Supprimer"),
                               onPressed: () async {

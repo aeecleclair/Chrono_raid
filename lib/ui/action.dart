@@ -18,7 +18,7 @@ class ActionField {
 
   // Le nom des colonnes dans la base de donnée
   static const String id = "id";
-  static String type = actionTypeToString(ActionType.Default);
+  static String type = "type";
   static const String ravito = "ravito";
   static const String date = "date";
   static const String temps_id = "temps_id";

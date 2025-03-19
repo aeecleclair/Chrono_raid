@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:chrono_raid/ui/temps.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:chrono_raid/tools/cache/cache_manager.dart';
@@ -26,7 +27,7 @@ abstract class Repository {
   Future<List> getList({String suffix = ""}) async {
     try {
       final response =
-          await http.get(Uri.parse(host + ext + suffix), headers: headers);
+          await http.get(Uri.parse("http://$host:8000" + ext + suffix), headers: headers);
       if (response.statusCode == 200) {
         try {
           String toDecode = response.body;
@@ -80,7 +81,7 @@ abstract class Repository {
   }) async {
     try {
       final response =
-          await http.get(Uri.parse(host + ext + id + suffix), headers: headers);
+          await http.get(Uri.parse("http://$host:8000" + ext + id + suffix), headers: headers);
       if (response.statusCode == 200) {
         try {
           String toDecode = response.body;
@@ -129,7 +130,7 @@ abstract class Repository {
   /// POST ext/suffix
   Future<dynamic> create(dynamic t, {String suffix = ""}) async {
     final response = await http.post(
-      Uri.parse(host + ext + suffix),
+      Uri.parse("http://$host:8000" + ext + suffix),
       headers: headers,
       body: jsonEncode(t),
     );
@@ -161,7 +162,7 @@ abstract class Repository {
   /// PATCH ext/id/suffix
   Future<bool> update(dynamic t, String tId, {String suffix = ""}) async {
     final response = await http.patch(
-      Uri.parse(host + ext + tId + suffix),
+      Uri.parse("http://$host:8000" + ext + tId + suffix),
       headers: headers,
       body: jsonEncode(t),
     );
@@ -184,7 +185,7 @@ abstract class Repository {
   /// DELETE ext/id/suffix
   Future<bool> delete(String tId, {String suffix = ""}) async {
     final response = await http.delete(
-      Uri.parse(host + ext + tId + suffix),
+      Uri.parse("http://$host:8000" + ext + tId + suffix),
       headers: headers,
     );
     if (response.statusCode == 204) {

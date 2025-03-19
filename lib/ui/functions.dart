@@ -1,9 +1,17 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
 
+import 'package:chrono_raid/tools/repository/csv_repository.dart';
+import 'package:chrono_raid/tools/repository/repository.dart';
+import 'package:chrono_raid/tools/repository/temps_repository.dart';
+import 'package:chrono_raid/ui/database.dart';
+import 'package:chrono_raid/ui/temps.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 Future<List<Map<String,String>>> readJsonEquipes() async {
   final String response = await rootBundle.loadString('assets/Equipes.json');
@@ -17,14 +25,27 @@ Future<List<Map<String,String>>> readJsonEquipes() async {
   return data2;
 }
 
+Future<List<String>> getParcours({String? ravito}) async {
+  final String response = await rootBundle.loadString('assets/Epreuves.json');
+  Map<String, dynamic> data = jsonDecode(response);
+  if (ravito != null) {
+    return data[ravito]?['Epreuves']?.keys.toList() ?? [];
+  }
+  return data.values
+      .expand((entry) => (entry['Epreuves'] as Map<String, dynamic>).keys)
+      .toSet()
+      .toList();
+}
+
 Future<Map<String, List<String>>> readJsonEpreuves(ravito) async {
   final String response = await rootBundle.loadString('assets/Epreuves.json');
   final d = json.decode(response);
   final Map<String, dynamic> data;
-  if (ravito == 'admin') { 
-    data = {"Découverte": [], "Sportif": [], "Expert": []};
+  if (ravito == 'admin') {
+    final List<String> list_parcours = await getParcours();
+    data = {for (var parcours in list_parcours) parcours: []};
     for (var r in d.keys) {
-      for (var p in ["Découverte", "Sportif", "Expert"]) {
+      for (var p in list_parcours) {
         data[p] = [data[p], d[r]["Epreuves"][p]].expand((x) => x).toList();
       }
     }
@@ -42,16 +63,15 @@ Future<Map<String, List<String>>> readJsonEpreuves(ravito) async {
       ),
   );
   return data2;
-
 }
 
 Future compteEpreuves() async {
   final String response = await rootBundle.loadString('assets/Epreuves.json');
   final d = json.decode(response);
-  final Map<String, dynamic> data;
-  data = {"Découverte": {}, "Sportif": {}, "Expert": {}};
+    final List<String> list_parcours = await getParcours();
+  final Map<String, dynamic> data = {for (var parcours in list_parcours) parcours: {}};
   for (var r in d.keys) {
-    for (var p in ["Découverte", "Sportif", "Expert"]) {
+    for (var p in list_parcours) {
       data[p][r] = d[r]["Epreuves"][p].length;
     }
   }
@@ -103,4 +123,59 @@ String actionTypeToString(ActionType at) {
 
 ActionType stringToActionType(String at) {
   return stringToActionTypeMap[at] ?? ActionType.Default;
+}
+
+void synchronisation(String last_syncro_date) async {
+  final repository = TempsRepository();
+  final dbm = DatabaseManager();
+  List<Temps> list_temps = await dbm.getTempsSince(last_syncro_date);
+
+  List<dynamic> list = await repository.create(
+    list_temps.map((t) => t.toJson()).toList(),
+    suffix: '/chrono_raid/temps/$last_syncro_date'
+  );
+
+  List<Temps> list_new_temps = list.map((t) => Temps.fromJson(t)).toList();
+
+  await dbm.deleteTempsSince(last_syncro_date);
+  await dbm.addListTemps(list_new_temps);
+}
+
+void download_csv() async {
+  MyCsvRepository csvRepository = MyCsvRepository();
+
+  csvRepository.getCsv(suffix: '/chrono_raid/csv_temps').then((csvData) async {
+
+    final directory;
+    
+    if (kIsDesktop) {
+      directory = await getDownloadsDirectory();
+    } else {
+      await requestPermissions();
+      directory = await getExternalStorageDirectory();
+
+    }
+
+    final path = '${directory?.path}/download.csv';
+
+    final file = File(path);
+    await file.writeAsString(csvData);
+
+  }).catchError((error) {
+    print('Error: $error');
+  });
+}
+
+Future<void> requestPermissions() async {
+  if (Platform.isAndroid) {
+    var status = await Permission.storage.request();
+    if (!status.isGranted) {
+      throw Exception('Permission refusée');
+    }
+  } else if (Platform.isIOS) {
+    var status = await Permission.photos.request();
+    if (!status.isGranted) {
+      throw Exception('Permission refusée');
+    }
+  }
 }

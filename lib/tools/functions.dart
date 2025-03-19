@@ -429,56 +429,6 @@ bool isNotStaff(String email) {
   return !regex.hasMatch(email);
 }
 
-String getAppFlavor() {
-  if (appFlavor != null) {
-    return appFlavor!;
-  }
-
-  if (const String.fromEnvironment("flavor") != "") {
-    return const String.fromEnvironment("flavor");
-  }
-
-  throw StateError("App flavor not set");
-}
-
-Plausible? getPlausible() {
-  final serverUrl = dotenv.env["PLAUSIBLE_HOST"];
-  final domain = dotenv.env["PLAUSIBLE_DOMAIN"];
-
-  if (serverUrl == null || domain == null) {
-    return null;
-  }
-
-  if (getAppFlavor() == "prod" || getAppFlavor() == "alpha") {
-    return Plausible(serverUrl, domain);
-  }
-
-  return null;
-}
-
-String getTitanHost() {
-  var host = dotenv.env["${getAppFlavor().toUpperCase()}_HOST"];
-
-  if (host == null || host == "") {
-    throw StateError("Could not find host corresponding to flavor");
-  }
-
-  return host;
-}
-
-String getTitanPackageName() {
-  switch (getAppFlavor()) {
-    case "dev":
-      return "fr.myecl.titan.dev";
-    case "alpha":
-      return "fr.myecl.titan.alpha";
-    case "prod":
-      return "fr.myecl.titan";
-    default:
-      throw StateError("Invalid app flavor");
-  }
-}
-
 String getTitanLogo() {
-  return "assets/images/logo_${getAppFlavor()}.png";
+  return "assets/images/logo_prod.png";
 }

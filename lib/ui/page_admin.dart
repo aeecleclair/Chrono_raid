@@ -1,17 +1,22 @@
-
+import 'package:chrono_raid/tools/providers/last_syncro_date_provider.dart';
 import 'package:chrono_raid/ui/functions.dart';
 import 'package:chrono_raid/ui/onglet_compilateur.dart';
 import 'package:chrono_raid/ui/onglet_compte.dart';
 import 'package:chrono_raid/ui/onglet_consulte_remarque.dart';
 import 'package:chrono_raid/ui/onglet_edit_temps.dart';
-import 'package:chrono_raid/ui/onglet_remarque.dart';
 import 'package:chrono_raid/ui/onglet_temps_manquants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PageAdmin extends StatefulHookWidget {
-  const PageAdmin({super.key});
+  final WidgetRef ref;
+
+  const PageAdmin({
+    required this.ref,
+    super.key
+  });
 
   @override
   State<PageAdmin> createState() => _MainPageState();
@@ -20,6 +25,8 @@ class PageAdmin extends StatefulHookWidget {
 class _MainPageState extends State<PageAdmin> {
   @override
   Widget build(BuildContext context) {
+    final lastSynchroDate = widget.ref.watch(lastSynchroDateProvider);
+    final lastSynchroDateNotifier = widget.ref.watch(lastSynchroDateProvider.notifier);
     final bool isMobile = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
     return MaterialApp(
       home: DefaultTabController(
@@ -38,7 +45,10 @@ class _MainPageState extends State<PageAdmin> {
                   ),
                   Text('Admin'),
                   IconButton(
-                    onPressed: () {}, 
+                    onPressed: () {
+                      synchronisation(lastSynchroDate);
+                      lastSynchroDateNotifier.editDate(DateTime.now().toIso8601String());
+                    }, 
                     icon:const Icon(Icons.sync)
                   ),
                 ],
@@ -49,7 +59,7 @@ class _MainPageState extends State<PageAdmin> {
               title: null,
               bottom: buildTabs(isMobile),
             ),
-            body: buildTabsContent(isMobile),
+            body: buildTabsContent(isMobile, widget.ref),
             bottomNavigationBar: isMobile ? buildTabs(isMobile) : null,
           ),
         ),
@@ -87,24 +97,24 @@ class _MainPageState extends State<PageAdmin> {
     );
   }
 
-  Widget buildTabsContent(bool isMobile) {
+  Widget buildTabsContent(bool isMobile, WidgetRef ref) {
     if (isMobile) {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         body: Column(
           children: [
             Expanded(
-              child: Tabs()
+              child: Tabs(ref)
             ),
             Divider(thickness: 1),
           ]
         ),
       );
     }
-    return Tabs();
+    return Tabs(ref);
   }
 
-  Widget Tabs() {
+  Widget Tabs(WidgetRef ref) {
     final ravitoValue = [useState('admin'), useState('admin'), useState('admin')];
 
     return FutureBuilder(
@@ -160,7 +170,7 @@ class _MainPageState extends State<PageAdmin> {
             SingleChildScrollView(child: OngletTempsManquants()),
         
             // Onglet Compilateur
-            OngletCompilateur(),
+            OngletCompilateur(ref),
           ],
         );
       }

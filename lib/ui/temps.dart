@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:uuid/uuid.dart';
 
 const String tableTemps = "temps";
@@ -9,6 +11,8 @@ class TempsField {
     date,
     parcours,
     ravito,
+    status,
+    last_modification_date,
   ];
 
   // Le nom des colonnes dans la base de donnée
@@ -17,6 +21,8 @@ class TempsField {
   static const String date = "date";
   static const String parcours = "parcours";
   static const String ravito = "ravito";
+  static const String status = "status";
+  static const String last_modification_date = "last_modification_date";
 }
 
 class Temps {
@@ -25,18 +31,30 @@ class Temps {
   String date = "";
   String parcours = "";
   String ravito = "";
+  bool status = true;
+  String last_modification_date = "";
 
-  Temps(int Dossard, String Date, String Parcours, String Ravito, {String Id = ""}) {
+  Temps(
+    int Dossard,
+    String Date,
+    String Parcours,
+    String Ravito,
+    bool status,
+    String Last_modification_date,
+    {String Id = ""}
+  ) {
     id = Id.isEmpty ? Uuid().v4() : Id;
     dossard = Dossard;
     date = Date;
     parcours = Parcours;
     ravito = Ravito;
+    status = status;
+    last_modification_date = Last_modification_date;
   }
 
   @override
   String toString(){
-    return "Temps(id: $id, dossard: $dossard, parcours: $parcours, ravito: $ravito, date: $date)";
+    return "Temps(id: $id, dossard: $dossard, parcours: $parcours, ravito: $ravito, date: $date, status: $status, last modification date: $last_modification_date)";
   }
 
   static Temps fromJson(Map<String, Object?> json) =>
@@ -45,6 +63,8 @@ class Temps {
         json[TempsField.date] as String,
         json[TempsField.parcours] as String,
         json[TempsField.ravito] as String,
+        json[TempsField.status] == 1,
+        json[TempsField.last_modification_date] as String,
         Id: json[TempsField.id] as String,
       );
 
@@ -53,8 +73,10 @@ class Temps {
       TempsField.id: id,
       TempsField.dossard: dossard,
       TempsField.date: date,
-      TempsField.parcours:parcours,
-      TempsField.ravito:ravito,
+      TempsField.parcours: parcours,
+      TempsField.ravito: ravito,
+      TempsField.status: status ? 1 : 0,
+      TempsField.last_modification_date: last_modification_date,
     };
 
 }
