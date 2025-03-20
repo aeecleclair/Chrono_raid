@@ -10,7 +10,7 @@ abstract class CsvRepository extends Repository {
   Future<String> getCsv({String suffix = ""}) async {
     try {
       final response = await http
-          .get(Uri.parse("http://${Repository.host}:8000$ext$suffix"), headers: headers);
+          .get(Uri.parse("${Repository.host}$ext$suffix"), headers: headers);
       if (response.statusCode == 200) {
         try {
           return response.body;

@@ -131,7 +131,7 @@ void synchronisation(String last_syncro_date) async {
 
   List<dynamic> list = await repository.create(
     list_temps.map((t) => t.toJson()).toList(),
-    suffix: '/chrono_raid/temps/$last_syncro_date'
+    suffix: 'chrono_raid/temps/$last_syncro_date'
   );
 
   List<Temps> list_new_temps = list.map((t) => Temps.fromJson(t)).toList();
@@ -143,7 +143,7 @@ void synchronisation(String last_syncro_date) async {
 void download_csv() async {
   MyCsvRepository csvRepository = MyCsvRepository();
 
-  csvRepository.getCsv(suffix: '/chrono_raid/csv_temps').then((csvData) async {
+  csvRepository.getCsv(suffix: 'chrono_raid/csv_temps').then((csvData) async {
 
     final directory;
     
