@@ -21,7 +21,8 @@ dependencies:
   flutter_dotenv: ^5.2.1
   flutter_hooks: ^0.20.0
   flutter_riverpod: ^2.1.1
-  flutter_secure_storage: ^9.2.4
+  flutter_secure_storage: 9.0.0
+  flutter_secure_storage_macos: 3.0.1
   google_fonts: ^6.2.1
   heroicons: ^0.11.0
   hooks_riverpod: ^2.6.1
