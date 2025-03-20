@@ -348,7 +348,7 @@ class DatabaseManager {
     final result = await db.rawQuery('''
       SELECT *
       FROM $tableTemps
-      WHERE ${TempsField.id} > '$id'
+      WHERE ${TempsField.id} = '$id'
     ''');
     if (result.isNotEmpty) {
       final Temps r = Temps.fromJson(result[0]);
