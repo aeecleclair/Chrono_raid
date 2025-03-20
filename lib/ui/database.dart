@@ -364,7 +364,7 @@ class DatabaseManager {
       UPDATE $tableTemps
       SET ${TempsField.date} = '${t.date}',
           ${TempsField.status} = '${t.status}',
-          ${TempsField.last_modification_date} = '${t.last_modification_date}',
+          ${TempsField.last_modification_date} = '${t.last_modification_date}'
       WHERE ${TempsField.id} = '${t.id}'
     ''');
   }
