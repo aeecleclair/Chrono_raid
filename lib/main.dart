@@ -2,6 +2,7 @@ import 'package:chrono_raid/auth/providers/openid_provider.dart';
 import 'package:chrono_raid/login/ui/app_sign_in.dart';
 import 'package:chrono_raid/tools/constants.dart';
 import 'package:chrono_raid/tools/providers/last_syncro_date_provider.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -37,13 +38,24 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      scrollBehavior: CustomScrollBehavior(),
       home: HomePage(),
     );
   }
+}
+
+class CustomScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.touch,
+        PointerDeviceKind.trackpad,
+      };
 }
 
 class HomePage extends ConsumerWidget {

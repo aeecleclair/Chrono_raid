@@ -342,6 +342,38 @@ class DatabaseManager {
       await db.insert(tableTemps, json);
     }
   }
+  
+  Future<Temps?> getTempsbyId(String id) async {
+    final db = await instance.database;
+    final result = await db.rawQuery('''
+      SELECT *
+      FROM $tableTemps
+      WHERE ${TempsField.id} > '$id'
+    ''');
+    if (result.isNotEmpty) {
+      final Temps r = Temps.fromJson(result[0]);
+      return r;
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> updateTemps(Temps t) async {
+    final db = await instance.database;
+    await db.execute('''
+      UPDATE $tableTemps
+      SET ${TempsField.date} = '${t.date}',
+          ${TempsField.status} = '${t.status}',
+          ${TempsField.last_modification_date} = '${t.last_modification_date}',
+      WHERE ${TempsField.id} = '${t.id}'
+    ''');
+  }
+
+  Future<void> addTemps(Temps t) async {
+    final db = await instance.database;
+    final json = t.toJson();
+    await db.insert(tableTemps, json);
+  }
 
   /// Action
 

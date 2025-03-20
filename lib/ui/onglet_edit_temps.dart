@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:chrono_raid/ui/popup_edit_temps.dart';
 import 'package:chrono_raid/tools/constants.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -40,7 +41,8 @@ class OngletEditTemps extends HookWidget {
           });
         }
  
-        final scrollController = {for (var parcours in list_parcours) parcours: ScrollController()};
+        final Map<String, ScrollController> scrollController = {for (var parcours in list_parcours) parcours: ScrollController()};
+        final ScrollController verticalScrollController = ScrollController();
         
         return FutureBuilder<List<Object>>(
           future: Future.wait([
@@ -60,50 +62,79 @@ class OngletEditTemps extends HookWidget {
             final temps = data[0] as Map<String, dynamic>;
             final epreuves = data[1] as Map<String, dynamic>;
             
-            return Column(
-              children: [
-                for (var parcours in list_parcours) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        parcours,
-                        style: const TextStyle(
-                          fontSize: 30,
-                          decoration: TextDecoration.underline,
+            return SingleChildScrollView(
+              controller: verticalScrollController,
+              scrollDirection: Axis.vertical,
+              child: Column(
+                children: [
+                  for (var parcours in list_parcours) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          parcours,
+                          style: const TextStyle(
+                            fontSize: 30,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          dropdown.value![parcours] = !dropdown.value![parcours]!;
-                          refresh.value = !refresh.value;
-                        },
-                        child: dropdown.value![parcours]! ? const Icon(Icons.keyboard_arrow_up) : const Icon(Icons.keyboard_arrow_down),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  if (temps[parcours] != null && dropdown.value![parcours]!)
-                    Scrollbar(
-                      controller: scrollController[parcours],
-                      thumbVisibility: true,
-                      child: SingleChildScrollView(
-                        controller: scrollController[parcours],
-                        scrollDirection: Axis.horizontal,
-                        child: Builder(
-                          builder: (context) {
-                            double w = max(((epreuves[parcours].length + 2) * (kIsMobile ? 80 : 120)).toDouble(), MediaQuery.of(context).size.width);
-                            return SizedBox(
-                              width: w,
-                              child: grid(epreuves[parcours], temps[parcours], kIsMobile, refresh, w),
-                            );
+                        TextButton(
+                          onPressed: () {
+                            dropdown.value![parcours] = !dropdown.value![parcours]!;
+                            refresh.value = !refresh.value;
                           },
+                          child: dropdown.value![parcours]! ? const Icon(Icons.keyboard_arrow_up) : const Icon(Icons.keyboard_arrow_down),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    if (temps[parcours] != null && dropdown.value![parcours]!)
+                      // GestureDetector(
+                      //   onVerticalDragUpdate: (details) {
+                      //     verticalScrollController.jumpTo(
+                      //       verticalScrollController.offset - details.primaryDelta!,
+                      //     );
+                      //     print(details.primaryDelta);
+                      //   },
+                      //   onHorizontalDragUpdate: (details) {
+                      //     print(details.primaryDelta);
+                      //   },
+                      //   onTap: () {
+                      //     print('aah');
+                      //   },
+                      Listener(
+                        onPointerSignal: (PointerSignalEvent event) {
+                          if (event is PointerScrollEvent) {
+                            //print('aaa ${event.scrollDelta.dy}');
+                          }
+                        },
+                        onPointerMove: (PointerMoveEvent event) {
+                          if (event.kind == PointerDeviceKind.trackpad) {
+                            //print(-event.delta.dy);
+                          }
+                        },
+                      child: Scrollbar(
+                        controller: scrollController[parcours],
+                        thumbVisibility: true,
+                        child: SingleChildScrollView(
+                          controller: scrollController[parcours],
+                          scrollDirection: Axis.horizontal,
+                          child: Builder(
+                            builder: (context) {
+                              double w = max(((epreuves[parcours].length + 2) * (kIsMobile ? 80 : 120)).toDouble(), MediaQuery.of(context).size.width);
+                              return SizedBox(
+                                width: w,
+                                child: grid(epreuves[parcours], temps[parcours], kIsMobile, refresh, w),
+                              );
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                  const SizedBox(height: 10),
+                      ),
+                    const SizedBox(height: 10),
+                  ],
                 ],
-              ],
+              ),
             );
           },
         );
@@ -112,7 +143,7 @@ class OngletEditTemps extends HookWidget {
   }
 
   Widget grid(epreuves, temps, kIsMobile, refresh, w) {
-    return GridView.builder(
+    return  GridView.builder(
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: epreuves.length + 2,
@@ -122,7 +153,7 @@ class OngletEditTemps extends HookWidget {
       itemBuilder: (context, index) {
         int rowIndex = index ~/ (epreuves.length + 2);
         int colIndex = (index % (epreuves.length + 2)).toInt();
-
+    
         return Container(
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: Colors.black, width: 0.5)),

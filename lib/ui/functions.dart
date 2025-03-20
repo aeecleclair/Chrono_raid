@@ -127,17 +127,28 @@ ActionType stringToActionType(String at) {
 void synchronisation(String last_syncro_date) async {
   final repository = TempsRepository();
   final dbm = DatabaseManager();
-  List<Temps> list_temps = await dbm.getTempsSince(last_syncro_date);
+  final List<Temps> list_temps = await dbm.getTempsSince(last_syncro_date);
+  print(list_temps);
 
   List<dynamic> list = await repository.create(
     list_temps.map((t) => t.toJson()).toList(),
     suffix: 'chrono_raid/temps/$last_syncro_date'
   );
-
+  print(list);
   List<Temps> list_new_temps = list.map((t) => Temps.fromJson(t)).toList();
 
-  await dbm.deleteTempsSince(last_syncro_date);
-  await dbm.addListTemps(list_new_temps);
+  for (var t in list_new_temps) {
+    final existing_t = await dbm.getTempsbyId(t.id);
+    if (existing_t != null) {
+      await dbm.updateTemps(t);
+    } else {
+      await dbm.addTemps(t);
+    }
+  }
+  
+
+  // await dbm.deleteTempsSince(last_syncro_date);
+  // await dbm.addListTemps(list_new_temps);
 }
 
 void download_csv() async {
