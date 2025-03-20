@@ -1,17 +1,272 @@
 {
-    "Equipes":[
-        {"dossard":"1", "parcours":"Expert"},
-        {"dossard":"2", "parcours":"Expert"},
-        {"dossard":"3", "parcours":"Expert"},
-        {"dossard":"101", "parcours":"Sportif"},
-        {"dossard":"102", "parcours":"Sportif"},
-        {"dossard":"103", "parcours":"Sportif"},
-        {"dossard":"104", "parcours":"Sportif"},
-        {"dossard":"105", "parcours":"Sportif"},
-        {"dossard":"201", "parcours":"Découverte"},
-        {"dossard":"202", "parcours":"Découverte"},
-        {"dossard":"203", "parcours":"Découverte"},
-        {"dossard":"204", "parcours":"Découverte"}
+    "Equipes": [
+        {
+            "dossard": "101",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "102",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "103",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "104",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "105",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "106",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "107",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "108",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "109",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "110",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "111",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "112",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "113",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "114",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "115",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "116",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "117",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "118",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "119",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "120",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "121",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "122",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "123",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "124",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "125",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "126",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "127",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "128",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "129",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "130",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "131",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "132",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "133",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "134",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "135",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "136",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "137",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "138",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "139",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "140",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "141",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "142",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "143",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "144",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "145",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "146",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "147",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "148",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "149",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "150",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "151",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "152",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "153",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "154",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "155",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "156",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "157",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "158",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "159",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "160",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "161",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "162",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "163",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "164",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "165",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "166",
+            "parcours": "Trail"
+        },
+        {
+            "dossard": "167",
+            "parcours": "Trail"
+        }
     ]
-
 }

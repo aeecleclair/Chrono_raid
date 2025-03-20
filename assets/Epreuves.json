@@ -1,27 +1,10 @@
 {
-    "Départ":{
+    "Départ": {
         "Epreuves": {
-            "Découverte": ["départ Trail 1"],
-            "Sportif": ["départ Trail 1"],
-            "Expert": ["départ Trail 1"]
-        },
-        "CO": false
-    },
-
-    "Ravito 1":{
-        "Epreuves": {
-            "Découverte": ["arrivee Trail 1", "départ CO", "arrivee CO", "départ VTT 4"],
-            "Sportif": ["arrivee Trail 1", "départ CO", "arrivee CO", "départ R&B 2", "arrivee R&B 2", "départ VTT 4"],
-            "Expert": ["arrivee Trail 1", "départ CO", "arrivee CO", "départ R&B 2", "arrivee R&B 2", "départ VTT 3", "arrivee VTT 3", "départ VTT 4"]
-        },
-        "CO": true
-    },
-
-    "Camping":{
-        "Epreuves": {
-            "Découverte": ["arrivee VTT 4"],
-            "Sportif": ["arrivee VTT 4"],
-            "Expert": ["arrivee VTT 4"]
+            "Trail": [
+                "départ Trail",
+                "arrivée Trail"
+            ]
         },
         "CO": false
     }
