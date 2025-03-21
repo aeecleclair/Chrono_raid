@@ -120,7 +120,7 @@ class OpenIdTokenProvider
   final String refreshTokenKey = "refresh_token";
   final List<String> scopes = ["API"];
   final FlutterAppAuth appAuth = const FlutterAppAuth();
-  final String redirectUrl = "<<>>://authorized";   // TODO :
+  final String redirectUrl = "chronoraid://authorized";   // TODO :
   final String redirectUrlHost = InternetAddress.loopbackIPv4.address;
   final int redirectUrlPort = 8001;
   final String discoveryUrl =
@@ -153,11 +153,9 @@ class OpenIdTokenProvider
         final codeChallenge = hash(codeVerifier);
 
         startLocalServer(redirectUri.toString(), redirectUrlHost, redirectUrlPort, codeVerifier);
-        print(redirectUri.toString());
 
         final Uri monUrl = Uri.parse("${Repository.host}auth/authorize?client_id=$clientId&response_type=code&scope=API&redirect_uri=http://$redirectUrlHost:$redirectUrlPort/static.html&code_challenge=$codeChallenge&code_challenge_method=S256");
 
-        print(monUrl.toString());
         
         if (await canLaunchUrl(monUrl)) {
           await launchUrl(monUrl, mode: LaunchMode.externalApplication);

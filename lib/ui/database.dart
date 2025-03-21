@@ -289,7 +289,6 @@ class DatabaseManager {
   }
 
   Future deleteTemps(Temps t) async {
-    print("this delete");
     final String now = DateTime.now().toIso8601String();
     final db = await instance.database;
     await db.execute('''
@@ -317,7 +316,6 @@ class DatabaseManager {
   /// Synchonisation
 
   Future<List<Temps>> getTempsSince(String limite_date) async {
-    print("getListTemps");
     final db = await instance.database;
     final result = await db.rawQuery('''
       SELECT *
@@ -330,7 +328,6 @@ class DatabaseManager {
   }
 
     Future<void> deleteTempsSince(String limite_date) async {
-      print("deleted");
     final db = await instance.database;
     await db.rawQuery('''
       DELETE FROM $tableTemps
@@ -339,7 +336,6 @@ class DatabaseManager {
   }
   
   Future<void> addListTemps(List<Temps> list_temps) async {
-    print("list added");
     final db = await instance.database;
     for (var t in list_temps) {
     final json = t.toJson();
@@ -348,7 +344,6 @@ class DatabaseManager {
   }
   
   Future<Temps?> getTempsbyId(String id) async {
-    print("getTempsbyId");
     final db = await instance.database;
     final result = await db.rawQuery('''
       SELECT *
@@ -364,15 +359,7 @@ class DatabaseManager {
   }
 
   Future<void> updateTemps(Temps t) async {
-    print("updateTemps");
     final db = await instance.database;
-    print('''
-      UPDATE $tableTemps
-      SET ${TempsField.date} = '${t.date}',
-          ${TempsField.status} = ${t.status?1:0},
-          ${TempsField.last_modification_date} = '${t.last_modification_date}'
-      WHERE ${TempsField.id} = '${t.id}'
-    ''');
     await db.execute('''
       UPDATE $tableTemps
       SET ${TempsField.date} = '${t.date}',
@@ -383,7 +370,6 @@ class DatabaseManager {
   }
 
   Future<void> addTemps(Temps t) async {
-    print("addTemps");
     final db = await instance.database;
     final json = t.toJson();
     await db.insert(tableTemps, json);
