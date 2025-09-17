@@ -93,13 +93,6 @@ String dateToFormat(String date) {
   }
 }
 
-Future<bool> isCO(ravito) async{
-  final String response = await rootBundle.loadString('assets/Epreuves.json');
-  final data = json.decode(response)[ravito]["CO"];
-  final bool value = data as bool;
-  return value;
-}
-
 enum ActionType {
   Default,
   DepartSimple,
