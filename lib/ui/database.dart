@@ -6,7 +6,6 @@ import 'temps.dart';
 import 'equipes.dart';
 import 'action.dart';
 import 'remarque.dart';
-import 'balise.dart';
 
 // le gestionnaire de base de donnée
 class DatabaseManager {
@@ -107,12 +106,6 @@ class DatabaseManager {
     );
     ''');
 
-    await db.execute('''
-    CREATE TABLE IF NOT EXISTS $tableBalise (
-        ${BaliseField.dossard} $intType,
-        ${BaliseField.nb_balise} $intType
-    );
-    ''');
   }
 
   /// General cruds
@@ -168,56 +161,25 @@ class DatabaseManager {
     return r;
   }
 
-  /// Balise
-
-  Future<String> createBalise(Balise b) async {
+  Future resetBDD() async {
     final db = await instance.database;
-    final result = await db.rawQuery('''
-      SELECT *
-      FROM $tableBalise
-      WHERE ${BaliseField.dossard} = ${b.dossard}
+    await db.execute('''
+      DELETE FROM $tableTemps
     ''');
-    if (result.isNotEmpty) {
-      return result.first['nb_balise'].toString();
-    }
-    else {
-      final json = b.toJson();
-      await db.insert(tableBalise, json);
-      return '';
-    }
-  }
 
-  Future<Balise?> getBalise(String dossard) async {
-    final db = await instance.database;
-    final result = await db.rawQuery('''
-      SELECT *
-      FROM $tableBalise
-      WHERE ${BaliseField.dossard} = '$dossard'
+    await db.execute('''
+      DELETE FROM $tableEquipes
     ''');
-    if (result.isNotEmpty) {
-      Balise r = Balise.fromJson(result[0]);
-      return r;
+
+    final value = await readJsonEquipes();
+    final List<Map<String,String>> equipes = value;
+    for (int i=0; i<equipes.length; i++) {
+      final Map<String,String> json = equipes[i];
+      await db.insert(tableEquipes, json); 
     }
-    return null;
-  }
 
-  Future<List<Balise>> getBalises() async {
-    final db = await instance.database;
-    final result = await db.rawQuery('''
-      SELECT *
-      FROM $tableBalise
-      ORDER BY ${BaliseField.dossard} ASC
-    ''');
-    List<Balise> r = result.map((e) => Balise.fromJson(e)).toList();
-    return r;
-  }
-
-  Future editBalise(String dossard, String nb_balise) async {
-    final db = await instance.database;
-    await db.rawQuery('''
-      UPDATE $tableBalise
-      SET ${BaliseField.nb_balise} = '$nb_balise'
-      WHERE ${BaliseField.dossard} = '$dossard'
+    await db.execute('''
+      DELETE FROM $tableAction
     ''');
   }
 
