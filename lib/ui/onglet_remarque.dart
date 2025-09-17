@@ -1,3 +1,4 @@
+import 'package:chrono_raid/ui/functions.dart';
 import 'package:chrono_raid/ui/remarque.dart';
 import 'package:chrono_raid/tools/constants.dart';
 import 'package:flutter/material.dart';
@@ -19,17 +20,7 @@ class OngletRemarque extends HookWidget {
       String remarque_text = _controllerRemarque.text;
       await dbm.createRemarque(Remarque(DateTime.now().toIso8601String(), ravito, remarque_text));
       _controllerRemarque.clear();
-      toastification.show(
-        context: context,
-        title: const Text('Remarque ajoutée !'),
-        autoCloseDuration: const Duration(seconds: 3),
-        primaryColor: Colors.black,
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.black,
-        icon: const Icon(Icons.check_circle_outlined),
-        closeOnClick: true,
-        alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
-      );
+      notif(context, 'Remarque ajoutée !', Colors.green, Icons.check_circle_outline);
     }
 
     return Center(

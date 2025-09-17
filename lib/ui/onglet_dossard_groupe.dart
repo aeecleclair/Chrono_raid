@@ -18,29 +18,9 @@ class OngletDossardGroupe extends HookWidget {
       try {
         String date = DateTime.now().toIso8601String();
         await dbm.createTempsGroupe(parcours.value!, date, ravito);
-        toastification.show(
-          context: context,
-          title: const Text('Temps ajoutés !'),
-          autoCloseDuration: const Duration(seconds: 3),
-          primaryColor: Colors.black,
-          backgroundColor: Colors.green,
-          foregroundColor: Colors.black,
-          icon: const Icon(Icons.check_circle_outlined),
-          closeOnClick: true,
-          alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
-        );
+        notif(context, 'Temps ajoutés !', Colors.green, Icons.check_circle_outline);
       } catch(e) {
-        toastification.show(
-          context: context,
-          title: Text(e.toString()),
-          autoCloseDuration: const Duration(seconds: 3),
-          primaryColor: Colors.black,
-          backgroundColor: Colors.red,
-          foregroundColor: Colors.black,
-          icon: const Icon(Icons.cancel_outlined),
-          closeOnClick: true,
-          alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
-        );
+        notif(context, e.toString(), Colors.red, Icons.cancel_outlined);
       }
     }
 

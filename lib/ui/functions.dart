@@ -7,11 +7,13 @@ import 'package:chrono_raid/tools/repository/repository.dart';
 import 'package:chrono_raid/tools/repository/temps_repository.dart';
 import 'package:chrono_raid/ui/database.dart';
 import 'package:chrono_raid/ui/temps.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:chrono_raid/tools/constants.dart';
+import 'package:toastification/toastification.dart';
 
 Future<List<Map<String,String>>> readJsonEquipes() async {
   final String response = await rootBundle.loadString('assets/Equipes.json');
@@ -184,4 +186,18 @@ Future<void> requestPermissions() async {
       throw Exception('Permission refusée');
     }
   }
+}
+
+void notif(BuildContext context, String text, Color color, IconData icon) {
+  toastification.show(
+    context: context,
+    title: Text(text),
+    autoCloseDuration: const Duration(seconds: 3),
+    primaryColor: Colors.black,
+    backgroundColor: color,
+    foregroundColor: Colors.black,
+    icon: Icon(icon),
+    closeOnClick: true,
+    alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
+  );
 }

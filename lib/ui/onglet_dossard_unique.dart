@@ -1,4 +1,5 @@
 import 'package:chrono_raid/ui/database.dart';
+import 'package:chrono_raid/ui/functions.dart';
 import 'package:chrono_raid/ui/popup_edit_temps.dart';
 import 'package:chrono_raid/ui/temps.dart';
 import 'package:chrono_raid/tools/constants.dart';
@@ -28,17 +29,7 @@ class OngletDossardUnique extends HookWidget {
         try {
           controllerDossard.clear();
           await dbm.createTemps(Temps(int.parse(dossard_str), now, await dbm.getParcoursByDossard(dossard_str), ravito, true, now));
-          toastification.show(
-            context: context,
-            title: const Text('Temps ajouté !'),
-            autoCloseDuration: const Duration(seconds: 3),
-            primaryColor: Colors.black,
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.black,
-            icon: const Icon(Icons.check_circle_outlined),
-            closeOnClick: true,
-            alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
-          );
+          notif(context, 'Temps ajouté !', Colors.green, Icons.check_circle_outline);
         } catch(e) {
           toastification.show(
             context: context,
@@ -72,17 +63,7 @@ class OngletDossardUnique extends HookWidget {
         }
       }
       else {
-        toastification.show(
-          context: context,
-          title: const Text('Dossard non valide'),
-          autoCloseDuration: const Duration(seconds: 3),
-          primaryColor: Colors.black,
-          backgroundColor: Colors.red,
-          foregroundColor: Colors.black,
-          icon: const Icon(Icons.cancel_outlined),
-          closeOnClick: true,
-          alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
-        );
+        notif(context, 'Dossard non valide', Colors.red, Icons.cancel_outlined);
       }
     }
 

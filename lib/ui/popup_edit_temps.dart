@@ -167,17 +167,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                                 } else {
                                   await dbm.editTemps(temps[colIndex], _selectedDate);
                                 }
-                                toastification.show(
-                                  context: context,
-                                  title: const Text('Temps modifié !'),
-                                  autoCloseDuration: const Duration(seconds: 3),
-                                  primaryColor: Colors.black,
-                                  backgroundColor: Colors.green,
-                                  foregroundColor: Colors.black,
-                                  icon: const Icon(Icons.check_circle_outlined),
-                                  closeOnClick: true,
-                                  alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
-                                );
+                                notif(context, 'Temps modifié !', Colors.green, Icons.check_circle_outline);
                                 widget.refresher.value = !widget.refresher.value;
                                 Navigator.of(context).pop();
                               },
@@ -188,31 +178,11 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                               onPressed: () async {
                                 try {
                                   await dbm.createTemps(Temps(int.parse(widget.dossard), _selectedDate, parcours, widget.ravito, true, DateTime.now().toIso8601String()));
-                                  toastification.show(
-                                    context: context,
-                                    title: const Text('Temps ajouté !'),
-                                    autoCloseDuration: const Duration(seconds: 3),
-                                    primaryColor: Colors.black,
-                                    backgroundColor: Colors.green,
-                                    foregroundColor: Colors.black,
-                                    icon: const Icon(Icons.check_circle_outlined),
-                                    closeOnClick: true,
-                                    alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
-                                  );
+                                  notif(context, 'Temps ajouté !', Colors.green, Icons.check_circle_outline);
                                   widget.refresher.value = !widget.refresher.value;
                                   Navigator.of(context).pop();
                                 } catch(e) {
-                                  toastification.show(
-                                    context: context,
-                                    title: Text(e.toString()),
-                                    autoCloseDuration: const Duration(seconds: 3),
-                                    primaryColor: Colors.black,
-                                    backgroundColor: Colors.red,
-                                    foregroundColor: Colors.black,
-                                    icon: const Icon(Icons.cancel_outlined),
-                                    closeOnClick: true,
-                                    alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
-                                  );
+                                  notif(context, e.toString(), Colors.red, Icons.cancel_outlined);
                                 }
                               },
                             );
@@ -225,17 +195,7 @@ class _PopupEditTempsState extends State<PopupEditTemps> {
                               child: const Text("Supprimer"),
                               onPressed: () async {
                                 await dbm.deleteTemps(temps[colIndex]);
-                                toastification.show(
-                                  context: context,
-                                  title: const Text('Temps supprimé !'),
-                                  autoCloseDuration: const Duration(seconds: 3),
-                                  primaryColor: Colors.black,
-                                  backgroundColor: Colors.green,
-                                  foregroundColor: Colors.black,
-                                  icon: const Icon(Icons.check_circle_outlined),
-                                  closeOnClick: true,
-                                  alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
-                                );
+                                notif(context, 'Temps supprimé !', Colors.green, Icons.check_circle_outline);
                                 widget.refresher.value = !widget.refresher.value;
                                 Navigator.of(context).pop();
                               },
