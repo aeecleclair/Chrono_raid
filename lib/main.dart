@@ -13,7 +13,6 @@ import 'ui/onglet_dossard_groupe.dart';
 import 'ui/onglet_compte.dart';
 import 'ui/onglet_edit_temps.dart';
 import 'ui/onglet_remarque.dart';
-import 'ui/onglet_CO.dart';
 import 'ui/functions.dart';
 import 'ui/onglet_edit_action.dart';
 import 'ui/page_admin.dart';
@@ -128,150 +127,125 @@ class MainPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final lastSynchroDate = ref.watch(lastSynchroDateProvider);
-    final lastSynchroDateNotifier = ref.watch(lastSynchroDateProvider.notifier);
     if (ravito == 'Admin') {
       return PageAdmin(ref: ref);
     }
 
-    return FutureBuilder(
-      future: isCO(ravito),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Erreur: ${snapshot.error}'));
-        }
-        final CO = snapshot.data!;
-        return MaterialApp(
-          home: DefaultTabController(
-            length: (kIsMobile? 5 : 6) + (CO? 1 : 0),
-            child: Scaffold(
-              resizeToAvoidBottomInset: false,
-              appBar: AppBar(
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        }, 
-                        icon:const Icon(Icons.arrow_back)
-                      ),
-                      Text(ravito),
-                      IconButton(
-                        onPressed: () {
-                          synchronisation(lastSynchroDate);
-                          lastSynchroDateNotifier.editDate(DateTime.now().toIso8601String());
-                        }, 
-                        icon:const Icon(Icons.sync)
-                      ),
-                    ],
+    return MaterialApp(
+      home: DefaultTabController(
+        length: (kIsMobile? 5 : 6),
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    }, 
+                    icon:const Icon(Icons.arrow_back)
                   ),
+                  Text(ravito),
+                  SynchronizationButton(),
+                ],
               ),
-              body: Scaffold(
-                resizeToAvoidBottomInset: false,
-                appBar: kIsMobile ? null : AppBar(
-                  title: null,
-                  bottom: buildTabs(CO),
-                ),
-                body: buildTabsContent(CO, ravito),
-                bottomNavigationBar: kIsMobile ? buildTabs(CO) : null,
-              ),
-            ),
           ),
-        );
-      }
+          body: Scaffold(
+            resizeToAvoidBottomInset: false,
+            appBar: kIsMobile ? null : AppBar(
+              title: null,
+              bottom: buildTabs(),
+            ),
+            body: buildTabsContent(ravito),
+            bottomNavigationBar: kIsMobile ? buildTabs() : null,
+          ),
+        ),
+      ),
     );
   }
+}
 
-  PreferredSizeWidget buildTabs(bool CO) {
-    return TabBar(
-      tabs:[
-        for (final tab in [
-          if (kIsMobile) ...[
-            {'icon': Icons.person, 'text': 'Départ'},
-          ] else ...[
-            {'icon': Icons.person, 'text': 'Départ simple'},
-            {'icon': Icons.group, 'text': 'Départ groupé'},
-          ],
-          if (CO) ...[
-            {'icon': Icons.map_rounded, 'text': "Course d'orientation"},
-          ],
-          {'icon': Icons.supervisor_account_outlined, 'text': 'Compte'},
-          {'icon': Icons.edit, 'text': 'Temps'},
-          {'icon': Icons.edit, 'text': 'Actions'},
-          {'icon': Icons.speaker_notes, 'text': 'Remarques'},
-        ])
-          Tab(
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 20,
-              runSpacing: 5,
-              children: [
-                Icon(tab['icon'] as IconData, size: 24),
-                Text(
-                  tab['text'] as String,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-      ],
-      labelPadding: EdgeInsets.only(bottom: 25),
-    );
-  }
-
-  Widget buildTabsContent(bool CO, String ravito) {
-    final editTempsScrollController = ScrollController();
-    return Column(
-      children: [
-        Expanded(
-          child: TabBarView(
-            physics: NeverScrollableScrollPhysics(),
+PreferredSizeWidget buildTabs() {
+  return TabBar(
+    tabs:[
+      for (final tab in [
+        if (kIsMobile) ...[
+          {'icon': Icons.person, 'text': 'Départ'},
+        ] else ...[
+          {'icon': Icons.person, 'text': 'Départ simple'},
+          {'icon': Icons.group, 'text': 'Départ groupé'},
+        ],
+        {'icon': Icons.supervisor_account_outlined, 'text': 'Compte'},
+        {'icon': Icons.edit, 'text': 'Temps'},
+        {'icon': Icons.edit, 'text': 'Actions'},
+        {'icon': Icons.speaker_notes, 'text': 'Remarques'},
+      ])
+        Tab(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 20,
+            runSpacing: 5,
             children: [
-              if (kIsMobile) ...[
-                // Onglet fusionné dossard unique et groupe
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    OngletDossardUnique(ravito),
-                    Divider(thickness: 1,),
-                    OngletDossardGroupe(ravito),
-                  ],
-                ),
-              ] else ...[
-                // Onglet départ dossard unique
-                OngletDossardUnique(ravito),
-
-                // Onglet départ dossard groupe
-                OngletDossardGroupe(ravito),
-              ],
-
-              // Onglet CO
-              if (CO) OngletCO(),
-    
-              // Onglet compte dossard
-              SingleChildScrollView(child: OngletCompte(ravito)),
-    
-              // Onglet consulte et edit temps
-              SingleChildScrollView(
-                controller: editTempsScrollController,
-                child: OngletEditTemps(ravito, editTempsScrollController)
+              Icon(tab['icon'] as IconData, size: 24),
+              Text(
+                tab['text'] as String,
+                textAlign: TextAlign.center,
               ),
-              
-              // Onglet consulte et edit actions
-              SingleChildScrollView(child: OngletEditAction(ravito)),
-    
-              // Onglet remarque
-              SingleChildScrollView(child: OngletRemarque(ravito)),
             ],
           ),
         ),
-        if (kIsMobile) Divider(thickness: 1),
-      ]
-    );
-  }
+    ],
+    labelPadding: EdgeInsets.only(bottom: 25),
+  );
+}
+
+Widget buildTabsContent(String ravito) {
+  final editTempsScrollController = ScrollController();
+  return Column(
+    children: [
+      Expanded(
+        child: TabBarView(
+          physics: NeverScrollableScrollPhysics(),
+          children: [
+            if (kIsMobile) ...[
+              // Onglet fusionné dossard unique et groupe
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  OngletDossardUnique(ravito),
+                  Divider(thickness: 1,),
+                  OngletDossardGroupe(ravito),
+                ],
+              ),
+            ] else ...[
+              // Onglet départ dossard unique
+              OngletDossardUnique(ravito),
+
+              // Onglet départ dossard groupe
+              OngletDossardGroupe(ravito),
+            ],
+  
+            // Onglet compte dossard
+            SingleChildScrollView(child: OngletCompte(ravito)),
+  
+            // Onglet consulte et edit temps
+            SingleChildScrollView(
+              controller: editTempsScrollController,
+              child: OngletEditTemps(ravito, editTempsScrollController)
+            ),
+            
+            // Onglet consulte et edit actions
+            SingleChildScrollView(child: OngletEditAction(ravito)),
+  
+            // Onglet remarque
+            SingleChildScrollView(child: OngletRemarque(ravito)),
+          ],
+        ),
+      ),
+      if (kIsMobile) Divider(thickness: 1),
+    ]
+  );
 }

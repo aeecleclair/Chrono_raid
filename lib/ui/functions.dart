@@ -53,14 +53,12 @@ Future<Map<String, List<String>>> readJsonEpreuves(ravito) async {
     data = d[ravito]["Epreuves"];
   }
   final Map<String, List<String>> data2 = Map.fromEntries(
-    data.entries
-      .where((entry) => entry.key != "CO")
-      .map(
-        (entry) => MapEntry(
-          entry.key,
-          List<String>.from(entry.value),
-        ),
+    data.entries.map(
+      (entry) => MapEntry(
+        entry.key,
+        List<String>.from(entry.value),
       ),
+    ),
   );
   return data2;
 }
