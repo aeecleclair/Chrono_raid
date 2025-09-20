@@ -20,7 +20,7 @@ class OngletConsulteRemarque extends HookWidget {
         } else if (snapshot.hasError) {
           return Center(child: Text('Erreur: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
-          return const Center(child: Text('Aucune remarques disponible'));
+          return const Center(child: Text('Aucune remarque disponible'));
         }
         
         final data = snapshot.data!.map((r) => {'date': dateToFormat(r.date), 'ravito': r.ravito, 'texte': r.texte}).toList();
