@@ -1,11 +1,10 @@
-import 'package:chrono_raid/tools/providers/last_syncro_date_provider.dart';
 import 'package:chrono_raid/ui/functions.dart';
-import 'package:chrono_raid/ui/onglet_compilateur.dart';
 import 'package:chrono_raid/ui/onglet_compte.dart';
 import 'package:chrono_raid/ui/onglet_consulte_remarque.dart';
 import 'package:chrono_raid/ui/onglet_edit_temps.dart';
 import 'package:chrono_raid/ui/onglet_temps_manquants.dart';
 import 'package:chrono_raid/tools/constants.dart';
+import 'package:chrono_raid/ui/synchronization_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,8 +24,6 @@ class PageAdmin extends StatefulHookWidget {
 class _MainPageState extends State<PageAdmin> {
   @override
   Widget build(BuildContext context) {
-    final lastSynchroDate = widget.ref.watch(lastSynchroDateProvider);
-    final lastSynchroDateNotifier = widget.ref.watch(lastSynchroDateProvider.notifier);
     return MaterialApp(
       home: DefaultTabController(
         length: 5,
@@ -43,13 +40,7 @@ class _MainPageState extends State<PageAdmin> {
                     icon:const Icon(Icons.arrow_back)
                   ),
                   Text('Admin'),
-                  IconButton(
-                    onPressed: () {
-                      synchronisation(lastSynchroDate);
-                      lastSynchroDateNotifier.editDate(DateTime.now().toIso8601String());
-                    }, 
-                    icon:const Icon(Icons.sync)
-                  ),
+                  SynchronizationButton(),
                 ],
               ),
           ),
@@ -58,7 +49,7 @@ class _MainPageState extends State<PageAdmin> {
               title: null,
               bottom: buildTabs(kIsMobile),
             ),
-            body: buildTabsContent(kIsMobile, widget.ref),
+            body: buildTabsContent(kIsMobile),
             bottomNavigationBar: kIsMobile ? buildTabs(kIsMobile) : null,
           ),
         ),
@@ -96,24 +87,24 @@ class _MainPageState extends State<PageAdmin> {
     );
   }
 
-  Widget buildTabsContent(bool kIsMobile, WidgetRef ref) {
+  Widget buildTabsContent(bool kIsMobile) {
     if (kIsMobile) {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         body: Column(
           children: [
             Expanded(
-              child: Tabs(ref)
+              child: Tabs()
             ),
             Divider(thickness: 1),
           ]
         ),
       );
     }
-    return Tabs(ref);
+    return Tabs();
   }
 
-  Widget Tabs(WidgetRef ref) {
+  Widget Tabs() {
     final ravitoValue = [useState('admin'), useState('admin'), useState('admin')];
 
     return FutureBuilder(
@@ -167,9 +158,6 @@ class _MainPageState extends State<PageAdmin> {
         
             // Onglet temps manquants
             SingleChildScrollView(child: OngletTempsManquants()),
-        
-            // Onglet Compilateur
-            OngletCompilateur(ref),
           ],
         );
       }

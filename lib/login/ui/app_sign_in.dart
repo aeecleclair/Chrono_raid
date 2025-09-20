@@ -82,8 +82,8 @@ class AppSignIn extends HookConsumerWidget {
                             );
                           },
                           color: ColorConstants.background2,
-                          icon: const HeroIcon(
-                            HeroIcons.arrowRight,
+                          icon: const Icon(
+                            Icons.arrow_right_alt_outlined,
                             color: ColorConstants.background2,
                             size: 35.0,
                           ),

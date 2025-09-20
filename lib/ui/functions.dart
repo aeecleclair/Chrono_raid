@@ -145,26 +145,28 @@ void synchronisation(String last_syncro_date) async {
 void download_csv() async {
   MyCsvRepository csvRepository = MyCsvRepository();
 
-  csvRepository.getCsv(suffix: 'chrono_raid/csv_temps').then((csvData) async {
+  for (var parcours in await getParcours()) {
 
-    final directory;
-    
-    if (kIsDesktop) {
-      directory = await getDownloadsDirectory();
-    } else {
-      await requestPermissions();
-      directory = await getExternalStorageDirectory();
+    csvRepository.getCsv(suffix: 'chrono_raid/csv_temps/$parcours').then((csvData) async {
 
-    }
+      final directory;
+      
+      if (kIsDesktop) {
+        directory = await getDownloadsDirectory();
+      } else {
+        await requestPermissions();
+        directory = await getExternalStorageDirectory();
+      }
 
-    final path = '${directory?.path}/download.csv';
+      final path = '${directory?.path}/Temps_$parcours.csv';
 
-    final file = File(path);
-    await file.writeAsString(csvData);
+      final file = File(path);
+      await file.writeAsString(csvData);
 
-  }).catchError((error) {
-    print('Error: $error');
-  });
+    }).catchError((error) {
+      print('Error: $error');
+    });
+  }
 }
 
 Future<void> requestPermissions() async {

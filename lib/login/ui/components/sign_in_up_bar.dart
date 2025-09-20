@@ -10,8 +10,8 @@ class SignInUpBar extends StatelessWidget {
     required this.onPressed,
     required this.isLoading,
     this.color = Colors.white,
-    this.icon = const HeroIcon(
-      HeroIcons.arrowRight,
+    this.icon = const Icon(
+      Icons.arrow_right_alt_outlined,
       color: Colors.white,
       size: 35.0,
     ),
@@ -21,7 +21,7 @@ class SignInUpBar extends StatelessWidget {
   final Future Function() onPressed;
   final bool isLoading;
   final Color color;
-  final HeroIcon icon;
+  final Icon icon;
 
   @override
   Widget build(BuildContext context) {

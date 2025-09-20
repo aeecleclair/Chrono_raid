@@ -2,6 +2,7 @@ import 'package:chrono_raid/auth/providers/openid_provider.dart';
 import 'package:chrono_raid/login/ui/app_sign_in.dart';
 import 'package:chrono_raid/tools/constants.dart';
 import 'package:chrono_raid/tools/providers/last_syncro_date_provider.dart';
+import 'package:chrono_raid/ui/synchronization_button.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -60,12 +61,6 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
 class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final token = ref.watch(tokenProvider);
-    if (token.isEmpty) {
-      return AppSignIn();
-    }
-    final lastSynchroDate = ref.watch(lastSynchroDateProvider);
-    final lastSynchroDateNotifier = ref.watch(lastSynchroDateProvider.notifier);
     return FutureBuilder<List<String>>(
       future: getRavitos(),
       builder: (context, snapshot) {
@@ -87,13 +82,7 @@ class HomePage extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text('Page d\'Accueil'),
-                IconButton(
-                  onPressed: () {
-                    synchronisation(lastSynchroDate);
-                    lastSynchroDateNotifier.editDate(DateTime.now().toIso8601String());
-                  }, 
-                  icon:const Icon(Icons.sync)
-                ),
+                SynchronizationButton(),
               ]
             ),
           ),

@@ -260,7 +260,6 @@ class DatabaseManager {
     ''');
     final a = Action(ActionType.Delete, t.ravito, DateTime.now().toIso8601String(), t.id, t.parcours, t.dossard.toString(), t.date, '-').toJson();
     await db.insert(tableAction, a);
-    
   }
 
   Future<List<Temps>> getTemps() async {
@@ -662,6 +661,4 @@ class DatabaseManager {
     List<Remarque> r = result.map<Remarque>((e) => Remarque.fromJson(e)).toList();
     return r;
   }
-
-
 }
