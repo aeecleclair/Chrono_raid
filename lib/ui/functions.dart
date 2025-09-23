@@ -6,6 +6,7 @@ import 'package:chrono_raid/tools/repository/csv_repository.dart';
 import 'package:chrono_raid/tools/repository/repository.dart';
 import 'package:chrono_raid/tools/repository/temps_repository.dart';
 import 'package:chrono_raid/ui/database.dart';
+import 'package:chrono_raid/ui/remarque.dart';
 import 'package:chrono_raid/ui/temps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -117,16 +118,18 @@ ActionType stringToActionType(String at) {
   return stringToActionTypeMap[at] ?? ActionType.Default;
 }
 
-void synchronisation(String last_syncro_date) async {
+Future<void> synchronisation(String last_syncro_date) async {
   final repository = TempsRepository();
   final dbm = DatabaseManager();
-  final List<Temps> list_temps = await dbm.getTempsSince(last_syncro_date);
 
-  List<dynamic> list = await repository.create(
+  // Temps
+
+  List<Temps> list_temps = await dbm.getTempsSince(last_syncro_date);
+
+  List<dynamic> list_new_temps = (await repository.create(
     list_temps.map((t) => t.toJson()).toList(),
     suffix: 'chrono_raid/temps/$last_syncro_date'
-  );
-  List<Temps> list_new_temps = list.map((t) => Temps.fromJson(t)).toList();
+  )).map((t) => Temps.fromJson(t)).toList();
 
   for (var t in list_new_temps) {
     final existing_t = await dbm.getTempsbyId(t.id);
@@ -135,11 +138,34 @@ void synchronisation(String last_syncro_date) async {
     } else {
       await dbm.addTemps(t);
     }
-  }
-  
+  }  
 
   // await dbm.deleteTempsSince(last_syncro_date);
   // await dbm.addListTemps(list_new_temps);
+
+  // Remarques
+
+  List<Remarque> list_remarques_local = await dbm.getRemarque('admin');
+
+  List<Remarque> list_remarques_serv = (await repository.getList(
+    suffix: 'chrono_raid/remarks'
+  )).map((r) => Remarque.fromJson(r)).toList();
+
+  final ids_serv = list_remarques_serv.map((e) => e.id).toSet();
+  final ids_local = list_remarques_local.map((e) => e.id).toSet();
+
+  List<Remarque> list_serv_minus_local = list_remarques_serv.where((obj) => !ids_local.contains(obj.id)).toList();
+  List<Remarque> list_local_minus_serv = list_remarques_local.where((obj) => !ids_serv.contains(obj.id)).toList();
+
+  for (var r in list_serv_minus_local) {
+    dbm.createRemarque(r);
+  }
+
+  await repository.create(
+    list_local_minus_serv.map((r) => r.toJson()).toList(),
+    suffix: "chrono_raid/remarks"
+  );
+
 }
 
 void download_csv() async {

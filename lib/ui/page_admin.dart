@@ -26,7 +26,7 @@ class _MainPageState extends State<PageAdmin> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: DefaultTabController(
-        length: 5,
+        length: 4,
         child: Scaffold(
           appBar: AppBar(
               title: Row(
@@ -65,7 +65,6 @@ class _MainPageState extends State<PageAdmin> {
           {'icon': Icons.edit, 'text': 'Temps'},
           {'icon': Icons.speaker_notes, 'text': 'Remarques'},
           {'icon': Icons.access_time, 'text': 'Temps Manquants'},
-          {'icon': Icons.calculate_outlined, 'text': 'Compilateur'},
         ])
           Tab(
             child: Wrap(

@@ -181,6 +181,10 @@ class DatabaseManager {
     await db.execute('''
       DELETE FROM $tableAction
     ''');
+
+    await db.execute('''
+      DELETE FROM $tableRemarque
+    ''');
   }
 
   /// Temps

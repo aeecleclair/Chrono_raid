@@ -17,8 +17,7 @@ class OngletDossardUnique extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final dossard = useState('');
-    final focusNode = useFocusNode();
-    final focusNode2 = useFocusNode();
+    final textFieldFocus = useFocusNode();
     final dbm = DatabaseManager();
     
     void envoyer() async {
@@ -65,48 +64,46 @@ class OngletDossardUnique extends HookWidget {
       else {
         notif(context, 'Dossard non valide', Colors.red, Icons.cancel_outlined);
       }
+      FocusScope.of(context).requestFocus(textFieldFocus);
     }
 
-    return Focus(
-        focusNode: focusNode,
-        autofocus: true,
-        child: KeyboardListener(
-          focusNode: focusNode2,
-          onKeyEvent: (KeyEvent event) {
-            if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
-              envoyer();
-            }
-          },
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  dossard.value,
-                ),
-                Container(
-                  width: 200,
-                  margin: const EdgeInsets.all(10.0),
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    controller: controllerDossard,
-                    decoration: const InputDecoration(
-                      labelText: 'Dossard',
-                    ),
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20,),
-                FloatingActionButton(
-                  onPressed: envoyer,
-                  child: const Text('Envoyer'),
-                ),
-              ],
+    return KeyboardListener(
+      focusNode: useFocusNode(),
+      onKeyEvent: (KeyEvent event) {
+        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
+          envoyer();
+        }
+      },
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              dossard.value,
             ),
-          ),
-        )
+            Container(
+              width: 200,
+              margin: const EdgeInsets.all(10.0),
+              child: TextField(
+                focusNode: textFieldFocus,
+                keyboardType: TextInputType.number,
+                controller: controllerDossard,
+                decoration: const InputDecoration(
+                  labelText: 'Dossard',
+                ),
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+              ),
+            ),
+            SizedBox(height: 20,),
+            FloatingActionButton(
+              onPressed: envoyer,
+              child: const Text('Envoyer'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

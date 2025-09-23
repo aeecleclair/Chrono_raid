@@ -78,7 +78,7 @@ class SynchronizationDialog extends ConsumerWidget {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  synchronisation(lastSynchroDate);
+                  await synchronisation(lastSynchroDate);
                   lastSynchroDateNotifier.editDate(DateTime.now().toIso8601String());
                   notif(context, 'Synchronisation réussie !', Colors.green, Icons.check_circle_outline);
                 } catch (e) {
@@ -97,7 +97,7 @@ class SynchronizationDialog extends ConsumerWidget {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  synchronisation(lastSynchroDate);
+                  await synchronisation(lastSynchroDate);
                   lastSynchroDateNotifier.editDate(DateTime.now().toIso8601String());
                   download_csv();
                   notif(context, 'Téléchargement réussi !', Colors.green, Icons.check_circle_outline);
