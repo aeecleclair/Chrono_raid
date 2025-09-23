@@ -14,11 +14,30 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:chrono_raid/tools/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
+Future<File> getLocalFile() async {
+  final dir = await getApplicationDocumentsDirectory();
+  return File('${dir.path}/Epreuves.json');
+}
+
+Future<Map<String, dynamic>> readEpreuvesJson() async {
+  final file = await getLocalFile();
+  String response;
+
+  if (await file.exists()) {
+    response = await file.readAsString();
+  } else {
+    response = await rootBundle.loadString('assets/Epreuves.json');
+    await file.writeAsString(response);
+  }
+  return json.decode(response);
+}
+
 Future<List<Map<String,String>>> readJsonEquipes() async {
-  final String response = await rootBundle.loadString('assets/Equipes.json');
-  final List<dynamic> data = await json.decode(response)["Equipes"];
+  final d = await readEpreuvesJson();
+  final List<dynamic> data = await d["Equipes"];
   final List<Map<String,String>> data2 = data.map(
     (item) => {
     "dossard": item["dossard"] as String, 
@@ -28,9 +47,9 @@ Future<List<Map<String,String>>> readJsonEquipes() async {
   return data2;
 }
 
+
 Future<List<String>> getParcours({String? ravito}) async {
-  final String response = await rootBundle.loadString('assets/Epreuves.json');
-  Map<String, dynamic> data = jsonDecode(response);
+  Map<String, dynamic> data = await readEpreuvesJson();
   if (ravito != null) {
     return data[ravito]?['Epreuves']?.keys.toList() ?? [];
   }
@@ -41,8 +60,7 @@ Future<List<String>> getParcours({String? ravito}) async {
 }
 
 Future<Map<String, List<String>>> readJsonEpreuves(ravito) async {
-  final String response = await rootBundle.loadString('assets/Epreuves.json');
-  final d = json.decode(response);
+  final d = await readEpreuvesJson();
   final Map<String, dynamic> data;
   if (ravito == 'admin') {
     final List<String> list_parcours = await getParcours();
@@ -67,8 +85,7 @@ Future<Map<String, List<String>>> readJsonEpreuves(ravito) async {
 }
 
 Future compteEpreuves() async {
-  final String response = await rootBundle.loadString('assets/Epreuves.json');
-  final d = json.decode(response);
+  final d = await readEpreuvesJson();
     final List<String> list_parcours = await getParcours();
   final Map<String, dynamic> data = {for (var parcours in list_parcours) parcours: {}};
   for (var r in d.keys) {
@@ -80,8 +97,7 @@ Future compteEpreuves() async {
 }
 
 Future<List<String>> getRavitos() async {
-  final String response = await rootBundle.loadString('assets/Epreuves.json');
-  final Map<String, dynamic> data = json.decode(response);
+  final Map<String, dynamic> data = await readEpreuvesJson();
   return List<String>.from(data.keys);
 }
 
