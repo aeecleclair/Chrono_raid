@@ -2,12 +2,10 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 import 'package:chrono_raid/tools/constants.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:chrono_raid/tools/plausible/plausible.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 enum TypeMsg { msg, error }

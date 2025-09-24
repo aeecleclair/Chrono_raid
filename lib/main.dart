@@ -1,7 +1,4 @@
-import 'package:chrono_raid/auth/providers/openid_provider.dart';
-import 'package:chrono_raid/login/ui/app_sign_in.dart';
 import 'package:chrono_raid/tools/constants.dart';
-import 'package:chrono_raid/tools/providers/last_syncro_date_provider.dart';
 import 'package:chrono_raid/ui/synchronization_button.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';

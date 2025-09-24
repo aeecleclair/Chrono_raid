@@ -134,7 +134,7 @@ abstract class Repository {
       headers: headers,
       body: jsonEncode(t),
     );
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       try {
         String toDecode = response.body;
         toDecode = utf8.decode(response.body.runes.toList());

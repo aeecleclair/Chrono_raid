@@ -10,7 +10,6 @@ import 'package:chrono_raid/tools/providers/last_syncro_date_provider.dart';
 import 'package:chrono_raid/ui/database.dart';
 import 'package:chrono_raid/ui/functions.dart';
 import 'package:qlevar_router/qlevar_router.dart';
-import 'package:toastification/toastification.dart';
 
 class SynchronizationButton extends StatelessWidget {
 

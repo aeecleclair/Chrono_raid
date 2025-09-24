@@ -23,8 +23,8 @@ class OngletConsulteRemarque extends HookWidget {
           return const Center(child: Text('Aucune remarque disponible'));
         }
         
-        final data = snapshot.data!.map((r) => {'date': dateToFormat(r.date), 'ravito': r.ravito, 'texte': r.texte}).toList();
-        data.insert(0, {'date': 'Date', 'ravito': 'Ravito', 'texte': 'Remarque'});
+        final data = snapshot.data!.map((r) => {'date': dateToFormat(r.date), 'ravito': r.ravito, 'text': r.text}).toList();
+        data.insert(0, {'date': 'Date', 'ravito': 'Ravito', 'text': 'Remarque'});
 
         return GridView.builder(
           shrinkWrap: true,
@@ -40,7 +40,7 @@ class OngletConsulteRemarque extends HookWidget {
         
             final r = data[rowIndex];
         
-            final String t = r['texte'] ?? '';
+            final String t = r['text'] ?? '';
         
             switch (columnIndex) {
               case 0:

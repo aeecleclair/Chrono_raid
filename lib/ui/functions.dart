@@ -3,7 +3,6 @@ import 'dart:core';
 import 'dart:io';
 
 import 'package:chrono_raid/tools/repository/csv_repository.dart';
-import 'package:chrono_raid/tools/repository/repository.dart';
 import 'package:chrono_raid/tools/repository/temps_repository.dart';
 import 'package:chrono_raid/ui/database.dart';
 import 'package:chrono_raid/ui/remarque.dart';
@@ -176,12 +175,12 @@ Future<void> synchronisation(String last_syncro_date) async {
   for (var r in list_serv_minus_local) {
     dbm.createRemarque(r);
   }
-
-  await repository.create(
-    list_local_minus_serv.map((r) => r.toJson()).toList(),
-    suffix: "chrono_raid/remarks"
-  );
-
+  if (list_local_minus_serv.isNotEmpty) {
+    await repository.create(
+      list_local_minus_serv.map((r) => r.toJson()).toList(),
+      suffix: "chrono_raid/remarks"
+    );
+  }
 }
 
 void download_csv() async {

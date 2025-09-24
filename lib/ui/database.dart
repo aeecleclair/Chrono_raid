@@ -102,7 +102,7 @@ class DatabaseManager {
         ${RemarqueField.id} $stringType,
         ${RemarqueField.date} $stringType,
         ${RemarqueField.ravito} $stringType,
-        ${RemarqueField.texte} $stringType
+        ${RemarqueField.text} $stringType
     );
     ''');
 
