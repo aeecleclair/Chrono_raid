@@ -1,4 +1,5 @@
 import 'package:chrono_raid/tools/constants.dart';
+import 'package:chrono_raid/ui/json_folder_storage.dart';
 import 'package:chrono_raid/ui/synchronization_button.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ import 'ui/page_admin.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  json_initialisation();
 
   if (kIsDesktop) {
     sqfliteFfiInit();

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:chrono_raid/ui/functions.dart';
 import 'package:crypto/crypto.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -115,7 +116,7 @@ class OpenIdTokenProvider
   final OpenIdRepository openIdRepository = OpenIdRepository();
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   final String tokenName = "my_ecl_auth_token";
-  final String clientId = "ChronoRaid";
+  final String clientId = "Titan";
   final String tokenKey = "token";
   final String refreshTokenKey = "refresh_token";
   final List<String> scopes = ["API"];
@@ -230,6 +231,7 @@ class OpenIdTokenProvider
 
       print("Access Token : $accessToken");
       print("Refresh Token : $refreshToken");
+      
     } catch (e) {
       print("Erreur lors de l'échange du code : $e");
     }

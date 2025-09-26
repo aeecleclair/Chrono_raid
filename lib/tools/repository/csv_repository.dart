@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:chrono_raid/tools/exception.dart';
 import 'package:chrono_raid/tools/repository/repository.dart';
 
-abstract class CsvRepository extends Repository {
+class CsvRepository extends Repository {
   static const String expiredTokenDetail = "Could not validate credentials";
 
   Future<String> getCsv({String suffix = ""}) async {
@@ -34,8 +34,5 @@ abstract class CsvRepository extends Repository {
       rethrow;
     }
   }
-}
-
-class MyCsvRepository extends CsvRepository {
 }
 

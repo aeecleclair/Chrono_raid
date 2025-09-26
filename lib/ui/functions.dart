@@ -3,8 +3,10 @@ import 'dart:core';
 import 'dart:io';
 
 import 'package:chrono_raid/tools/repository/csv_repository.dart';
+import 'package:chrono_raid/tools/repository/json_repository.dart';
 import 'package:chrono_raid/tools/repository/temps_repository.dart';
 import 'package:chrono_raid/ui/database.dart';
+import 'package:chrono_raid/ui/json_folder_storage.dart';
 import 'package:chrono_raid/ui/remarque.dart';
 import 'package:chrono_raid/ui/temps.dart';
 import 'package:flutter/material.dart';
@@ -16,27 +18,10 @@ import 'package:chrono_raid/tools/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
-Future<File> getLocalFile() async {
-  final dir = await getApplicationDocumentsDirectory();
-  return File('${dir.path}/Epreuves.json');
-}
-
-Future<Map<String, dynamic>> readEpreuvesJson() async {
-  final file = await getLocalFile();
-  String response;
-
-  if (await file.exists()) {
-    response = await file.readAsString();
-  } else {
-    response = await rootBundle.loadString('assets/Epreuves.json');
-    await file.writeAsString(response);
-  }
-  return json.decode(response);
-}
 
 Future<List<Map<String,String>>> readJsonEquipes() async {
-  final d = await readEpreuvesJson();
-  final List<dynamic> data = await d["Equipes"];
+  final String response = await loadJsonEquipes();
+  final List<dynamic> data = await json.decode(response)["Equipes"];
   final List<Map<String,String>> data2 = data.map(
     (item) => {
     "dossard": item["dossard"] as String, 
@@ -48,7 +33,8 @@ Future<List<Map<String,String>>> readJsonEquipes() async {
 
 
 Future<List<String>> getParcours({String? ravito}) async {
-  Map<String, dynamic> data = await readEpreuvesJson();
+  final String response = await loadJsonEpreuves();
+  Map<String, dynamic> data = jsonDecode(response);
   if (ravito != null) {
     return data[ravito]?['Epreuves']?.keys.toList() ?? [];
   }
@@ -59,7 +45,8 @@ Future<List<String>> getParcours({String? ravito}) async {
 }
 
 Future<Map<String, List<String>>> readJsonEpreuves(ravito) async {
-  final d = await readEpreuvesJson();
+  final String response = await loadJsonEpreuves();
+  final d = json.decode(response);
   final Map<String, dynamic> data;
   if (ravito == 'admin') {
     final List<String> list_parcours = await getParcours();
@@ -84,8 +71,9 @@ Future<Map<String, List<String>>> readJsonEpreuves(ravito) async {
 }
 
 Future compteEpreuves() async {
-  final d = await readEpreuvesJson();
-    final List<String> list_parcours = await getParcours();
+  final String response = await loadJsonEpreuves();
+  final d = json.decode(response);
+  final List<String> list_parcours = await getParcours();
   final Map<String, dynamic> data = {for (var parcours in list_parcours) parcours: {}};
   for (var r in d.keys) {
     for (var p in list_parcours) {
@@ -96,7 +84,8 @@ Future compteEpreuves() async {
 }
 
 Future<List<String>> getRavitos() async {
-  final Map<String, dynamic> data = await readEpreuvesJson();
+  final String response = await loadJsonEpreuves();
+  final Map<String, dynamic> data = json.decode(response);
   return List<String>.from(data.keys);
 }
 
@@ -117,6 +106,7 @@ enum ActionType {
   Edit,
 }
 
+
 final Map<ActionType, String> actionTypeToStringMap = {
   for (var at in ActionType.values) at: at.toString().split('.').last
 };
@@ -133,8 +123,30 @@ ActionType stringToActionType(String at) {
   return stringToActionTypeMap[at] ?? ActionType.Default;
 }
 
+Future<bool> jsonHasChanged() async {
+  final JsonRepository jsonRepository = JsonRepository();
+
+  final data_epreuves = await jsonRepository.getJson("Epreuves");
+  final data_equipes = await jsonRepository.getJson("Equipes");
+
+  bool epreuvesHasChanged =  await jsonIsChanged("Epreuves", data_epreuves);
+  bool equipesHasChanged = await jsonIsChanged("Equipes", data_equipes);
+
+  return epreuvesHasChanged || equipesHasChanged;
+}
+
+Future<void> jsonUpdate() async {
+  final JsonRepository jsonRepository = JsonRepository();
+
+  final data_epreuves = await jsonRepository.getJson("Epreuves");
+  final data_equipes = await jsonRepository.getJson("Equipes");
+
+  await replaceJson("Epreuves", data_epreuves);
+  await replaceJson("Equipes", data_equipes);
+}
+
 Future<void> synchronisation(String last_syncro_date) async {
-  final repository = TempsRepository();
+  final ClassicRepository repository = ClassicRepository();
   final dbm = DatabaseManager();
 
   // Temps
@@ -184,7 +196,7 @@ Future<void> synchronisation(String last_syncro_date) async {
 }
 
 void download_csv() async {
-  MyCsvRepository csvRepository = MyCsvRepository();
+  CsvRepository csvRepository = CsvRepository();
 
   for (var parcours in await getParcours()) {
 

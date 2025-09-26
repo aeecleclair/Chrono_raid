@@ -52,7 +52,7 @@ class LoginTextConstants {
   static const String promo = 'Promo entrante (ex : 2023)';
   static const String sendedMail = 'Mail de confirmation envoyé';
   static const String sendedResetMail = 'Mail de réinitialisation envoyé';
-  static const String signIn = 'Se connecter';
+  static const String signIn = 'Se connecter avec MyEcl';
   static const String register = 'S\'inscrire';
   static const String recievedMail = 'J\'ai reçu le mail';
   static const String recover = 'Réinitialiser';
