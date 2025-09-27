@@ -18,7 +18,7 @@ import 'ui/page_admin.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  json_initialisation();
+  await json_initialisation();
 
   if (kIsDesktop) {
     sqfliteFfiInit();

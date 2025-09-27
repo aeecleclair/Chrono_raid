@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:chrono_raid/tools/repository/csv_repository.dart';
 import 'package:chrono_raid/tools/repository/json_repository.dart';
-import 'package:chrono_raid/tools/repository/temps_repository.dart';
+import 'package:chrono_raid/tools/repository/classic_repository.dart';
 import 'package:chrono_raid/ui/database.dart';
 import 'package:chrono_raid/ui/json_folder_storage.dart';
 import 'package:chrono_raid/ui/remarque.dart';

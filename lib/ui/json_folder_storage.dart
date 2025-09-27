@@ -79,7 +79,7 @@ class JsonFolderStorage {
   }
 }
 
-void json_initialisation() async {
+Future<void> json_initialisation() async {
   final storage = JsonFolderStorage('json_data');
   if (!await storage.jsonExists('Epreuves') ||
       await storage.readJson('Epreuves') == '{}') {
