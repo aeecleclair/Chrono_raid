@@ -47,6 +47,8 @@ dependencies:
   zxcvbn: ^1.0.0
   collection: ^1.18.0
 
+  crypto: any
+  path_provider: any
 dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_test:

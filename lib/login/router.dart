@@ -13,7 +13,8 @@ class LoginRouter {
         builder: () => app_sign_in.AppSignIn(),
         pageType: const QMaterialPage(),
         middleware: [
-          DeferredLoadingMiddleware(app_sign_in.loadLibrary,
+          DeferredLoadingMiddleware(
+            app_sign_in.loadLibrary,
           ),
         ],
       );

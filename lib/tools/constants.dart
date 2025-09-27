@@ -35,5 +35,5 @@ const int maxHyperionFileSize = 4194304;
 final bool kIsDesktop = defaultTargetPlatform == TargetPlatform.windows ||
     defaultTargetPlatform == TargetPlatform.linux ||
     defaultTargetPlatform == TargetPlatform.macOS;
-final bool kIsMobile = defaultTargetPlatform == TargetPlatform.android || 
+final bool kIsMobile = defaultTargetPlatform == TargetPlatform.android ||
     defaultTargetPlatform == TargetPlatform.iOS;

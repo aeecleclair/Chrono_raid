@@ -5,7 +5,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 
 class OngletDossardGroupe extends HookWidget {
   final String ravito;
-  const OngletDossardGroupe(this.ravito, {super.key,}); 
+  const OngletDossardGroupe(
+    this.ravito, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +19,9 @@ class OngletDossardGroupe extends HookWidget {
       try {
         String date = DateTime.now().toIso8601String();
         await dbm.createTempsGroupe(parcours.value!, date, ravito);
-        notif(context, 'Temps ajoutés !', Colors.green, Icons.check_circle_outline);
-      } catch(e) {
+        notif(context, 'Temps ajoutés !', Colors.green,
+            Icons.check_circle_outline);
+      } catch (e) {
         notif(context, e.toString(), Colors.red, Icons.cancel_outlined);
       }
     }
@@ -35,7 +39,7 @@ class OngletDossardGroupe extends HookWidget {
         if (listParcours.isEmpty) {
           return const Center(child: Text('Aucun parcours disponible'));
         }
-        
+
         if (parcours.value == null && listParcours.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             parcours.value = listParcours[0];

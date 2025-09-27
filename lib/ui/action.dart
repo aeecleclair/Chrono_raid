@@ -26,7 +26,6 @@ class ActionField {
   static const String dossard = "dossard";
   static const String ancien_temps = "ancien_temps";
   static const String nouveau_temps = "nouveau_temps";
-
 }
 
 class Action {
@@ -40,7 +39,9 @@ class Action {
   String ancien_temps = "";
   String nouveau_temps = "";
 
-  Action(ActionType Type, String Ravito, String Date, String Temps_id, String Parcours, String Dossard, String AncienTemps, String NouveauTemps, {String Id = ""}) {
+  Action(ActionType Type, String Ravito, String Date, String Temps_id,
+      String Parcours, String Dossard, String AncienTemps, String NouveauTemps,
+      {String Id = ""}) {
     id = Id.isEmpty ? Uuid().v4() : Id;
     type = Type;
     ravito = Ravito;
@@ -51,14 +52,13 @@ class Action {
     ancien_temps = AncienTemps;
     nouveau_temps = NouveauTemps;
   }
-  
+
   @override
-  String toString(){
+  String toString() {
     return "Action(id: $id, type: $type, ravito: $ravito, date: $date, temps_id: $temps_id, parcours: $parcours, dossard: $dossard, temps: $ancien_temps, temps_json: $nouveau_temps)";
   }
 
-  static Action fromJson(Map<String, Object?> json) =>
-    Action(
+  static Action fromJson(Map<String, Object?> json) => Action(
         stringToActionType(json[ActionField.type] as String),
         json[ActionField.ravito] as String,
         json[ActionField.date] as String,
@@ -70,17 +70,15 @@ class Action {
         Id: json[ActionField.id] as String,
       );
 
-  Map<String, Object> toJson() =>
-    {
-      ActionField.id: id,
-      ActionField.type: actionTypeToString(type),
-      ActionField.ravito: ravito,
-      ActionField.date: date,
-      ActionField.temps_id: temps_id,
-      ActionField.parcours:parcours,
-      ActionField.dossard:dossard,
-      ActionField.ancien_temps:ancien_temps,
-      ActionField.nouveau_temps:nouveau_temps,
-    };
-
+  Map<String, Object> toJson() => {
+        ActionField.id: id,
+        ActionField.type: actionTypeToString(type),
+        ActionField.ravito: ravito,
+        ActionField.date: date,
+        ActionField.temps_id: temps_id,
+        ActionField.parcours: parcours,
+        ActionField.dossard: dossard,
+        ActionField.ancien_temps: ancien_temps,
+        ActionField.nouveau_temps: nouveau_temps,
+      };
 }

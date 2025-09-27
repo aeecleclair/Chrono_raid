@@ -28,7 +28,8 @@ class DatabaseManager {
   final doubleType = 'REAL NOT NULL';
 
   // Récupère la base de donnée si elle ne l'était pas déjà
-  Future<Database> get database async => await _initDB(); //_database ??= await _initDB();
+  Future<Database> get database async =>
+      await _initDB(); //_database ??= await _initDB();
 
   Future<Database> _initDB() async {
     /**
@@ -65,10 +66,10 @@ class DatabaseManager {
     );
     ''');
     final value = await readJsonEquipes();
-    final List<Map<String,String>> equipes = value;
-    for (int i=0; i<equipes.length; i++) {
-      final Map<String,String> json = equipes[i];
-      await db.insert(tableEquipes, json); 
+    final List<Map<String, String>> equipes = value;
+    for (int i = 0; i < equipes.length; i++) {
+      final Map<String, String> json = equipes[i];
+      await db.insert(tableEquipes, json);
     }
 
     await db.execute('''
@@ -105,20 +106,21 @@ class DatabaseManager {
         ${RemarqueField.text} $stringType
     );
     ''');
-
   }
 
   /// General cruds
 
-  Future<String> getParcoursByDossard(String dossard) async{
+  Future<String> getParcoursByDossard(String dossard) async {
     final db = await instance.database;
-    final List<Map<String, Object?>> result = await db.query(tableEquipes, columns: ['parcours'], where: 'dossard=$dossard');
+    final List<Map<String, Object?>> result = await db.query(tableEquipes,
+        columns: ['parcours'], where: 'dossard=$dossard');
     return result[0]["parcours"].toString();
   }
 
-  Future<bool> valideDossard(String dossard) async{
+  Future<bool> valideDossard(String dossard) async {
     final db = await instance.database;
-    final List<Map<String, Object?>> result = await db.query(tableEquipes, where: 'dossard=$dossard');
+    final List<Map<String, Object?>> result =
+        await db.query(tableEquipes, where: 'dossard=$dossard');
     return result.isNotEmpty;
   }
 
@@ -128,15 +130,15 @@ class DatabaseManager {
     final List<Map<String, Object?>> result;
     if (parcours == null) {
       result = await db.query(tableEquipes, orderBy: orderBy);
-    }
-    else {
+    } else {
       String whereString = "parcours = '$parcours'";
-      result = await db.query(tableEquipes, orderBy: orderBy, where: whereString);
+      result =
+          await db.query(tableEquipes, orderBy: orderBy, where: whereString);
     }
     List<Equipes> r = result.map((e) => Equipes.fromJson(e)).toList();
     return r;
   }
-  
+
   Future<Map<String, int>> countEquipes() async {
     final db = await instance.database;
     final result = await db.rawQuery('''
@@ -147,9 +149,7 @@ class DatabaseManager {
 
     final List<String> list_parcours = await getParcours();
 
-    final Map<String, int> r = {
-      for (var p in list_parcours) p:0
-    };
+    final Map<String, int> r = {for (var p in list_parcours) p: 0};
 
     for (var row in result) {
       final parcours = row["parcours"] as String?;
@@ -172,10 +172,10 @@ class DatabaseManager {
     ''');
 
     final value = await readJsonEquipes();
-    final List<Map<String,String>> equipes = value;
-    for (int i=0; i<equipes.length; i++) {
-      final Map<String,String> json = equipes[i];
-      await db.insert(tableEquipes, json); 
+    final List<Map<String, String>> equipes = value;
+    for (int i = 0; i < equipes.length; i++) {
+      final Map<String, String> json = equipes[i];
+      await db.insert(tableEquipes, json);
     }
 
     await db.execute('''
@@ -190,7 +190,8 @@ class DatabaseManager {
   /// Temps
 
   Future<void> createTemps(Temps t) async {
-    final nb_epreuves = ((await readJsonEpreuves(t.ravito))[t.parcours]!).length;
+    final nb_epreuves =
+        ((await readJsonEpreuves(t.ravito))[t.parcours]!).length;
     final db = await instance.database;
     final result = await db.rawQuery('''
       SELECT COUNT(*) as c
@@ -203,14 +204,25 @@ class DatabaseManager {
     }
     final json = t.toJson();
     await db.insert(tableTemps, json);
-    final a = Action(ActionType.DepartSimple, t.ravito, DateTime.now().toIso8601String(), t.id, t.parcours, t.dossard.toString(), '-', t.date).toJson();
+    final a = Action(
+            ActionType.DepartSimple,
+            t.ravito,
+            DateTime.now().toIso8601String(),
+            t.id,
+            t.parcours,
+            t.dossard.toString(),
+            '-',
+            t.date)
+        .toJson();
     await db.insert(tableAction, a);
     getTemps();
   }
 
-  Future<void> createTempsGroupe(String parcours, String date, String ravito) async {
+  Future<void> createTempsGroupe(
+      String parcours, String date, String ravito) async {
     final nb_epreuves = ((await readJsonEpreuves(ravito))[parcours]!).length;
-    final dossards = (await getEquipes(parcours)).map((equ) => equ.dossard).toList();
+    final dossards =
+        (await getEquipes(parcours)).map((equ) => equ.dossard).toList();
     final db = await instance.database;
 
     int nb_temps_ref = -1;
@@ -223,7 +235,7 @@ class DatabaseManager {
       '''))[0]['c'] as int;
       if (nb_temps_ref == -1) {
         nb_temps_ref = nb_temps;
-      } else if (nb_temps != nb_temps_ref){
+      } else if (nb_temps != nb_temps_ref) {
         throw Exception('Erreur : lignes remplies inégalement');
       }
     }
@@ -238,14 +250,25 @@ class DatabaseManager {
       await db.insert(tableTemps, json);
       temps_ids += '${t.id}/';
     }
-    final a = Action(ActionType.DepartGroupe, ravito, DateTime.now().toIso8601String(), temps_ids, parcours, '-', '-', date).toJson();
+    final a = Action(
+            ActionType.DepartGroupe,
+            ravito,
+            DateTime.now().toIso8601String(),
+            temps_ids,
+            parcours,
+            '-',
+            '-',
+            date)
+        .toJson();
     await db.insert(tableAction, a);
   }
 
   Future editTemps(Temps t, String date) async {
     final String now = DateTime.now().toIso8601String();
     final db = await instance.database;
-    final a = Action(ActionType.Edit, t.ravito, now, t.id, t.parcours, t.dossard.toString(), t.date, date).toJson();
+    final a = Action(ActionType.Edit, t.ravito, now, t.id, t.parcours,
+            t.dossard.toString(), t.date, date)
+        .toJson();
     await db.insert(tableAction, a);
     await db.execute('''
       UPDATE $tableTemps
@@ -262,7 +285,16 @@ class DatabaseManager {
       SET ${TempsField.status} = FALSE, ${TempsField.last_modification_date} = '$now'
       WHERE ${TempsField.id} = '${t.id}'
     ''');
-    final a = Action(ActionType.Delete, t.ravito, DateTime.now().toIso8601String(), t.id, t.parcours, t.dossard.toString(), t.date, '-').toJson();
+    final a = Action(
+            ActionType.Delete,
+            t.ravito,
+            DateTime.now().toIso8601String(),
+            t.id,
+            t.parcours,
+            t.dossard.toString(),
+            t.date,
+            '-')
+        .toJson();
     await db.insert(tableAction, a);
   }
 
@@ -277,7 +309,7 @@ class DatabaseManager {
     List<Temps> r = result.map((e) => Temps.fromJson(e)).toList();
     return r;
   }
-  
+
   /// Synchonisation
 
   Future<List<Temps>> getTempsSince(String limite_date) async {
@@ -292,22 +324,22 @@ class DatabaseManager {
     return r;
   }
 
-    Future<void> deleteTempsSince(String limite_date) async {
+  Future<void> deleteTempsSince(String limite_date) async {
     final db = await instance.database;
     await db.rawQuery('''
       DELETE FROM $tableTemps
       WHERE ${TempsField.last_modification_date} > '$limite_date'
     ''');
   }
-  
+
   Future<void> addListTemps(List<Temps> list_temps) async {
     final db = await instance.database;
     for (var t in list_temps) {
-    final json = t.toJson();
+      final json = t.toJson();
       await db.insert(tableTemps, json);
     }
   }
-  
+
   Future<Temps?> getTempsbyId(String id) async {
     final db = await instance.database;
     final result = await db.rawQuery('''
@@ -328,7 +360,7 @@ class DatabaseManager {
     await db.execute('''
       UPDATE $tableTemps
       SET ${TempsField.date} = '${t.date}',
-          ${TempsField.status} = ${t.status?1:0},
+          ${TempsField.status} = ${t.status ? 1 : 0},
           ${TempsField.last_modification_date} = '${t.last_modification_date}'
       WHERE ${TempsField.id} = '${t.id}'
     ''');
@@ -367,7 +399,7 @@ class DatabaseManager {
 
     final action = Action.fromJson(result);
 
-    switch(action.type) {
+    switch (action.type) {
       case ActionType.DepartSimple:
         await db.execute('''
           UPDATE $tableTemps
@@ -375,7 +407,7 @@ class DatabaseManager {
           WHERE ${TempsField.id} = '${action.temps_id}'
         ''');
         break;
-      
+
       case ActionType.DepartGroupe:
         final List ids = action.temps_id.split('/');
         final String string_id = "(${ids.map((e) => "'$e'").join(',')})";
@@ -391,7 +423,7 @@ class DatabaseManager {
           SET ${TempsField.status} = TRUE, ${TempsField.last_modification_date} = '$now'
           WHERE ${TempsField.id} = '${action.temps_id}'
         ''');
-        
+
       case ActionType.Edit:
         await db.execute('''
           UPDATE $tableTemps
@@ -412,7 +444,7 @@ class DatabaseManager {
 
   Future<List<Temps>> getTempsbyDossard(String dossard, String ravito) async {
     final db = await instance.database;
-    
+
     final result;
     if (ravito != 'admin') {
       result = await db.rawQuery('''
@@ -430,11 +462,12 @@ class DatabaseManager {
       ''');
     }
     final r = List<Temps>.from(result.map((e) => Temps.fromJson(e)));
-    
+
     return r;
   }
 
-  Future<Map<String, Map<int, List<String>>>> getTempsOrderedbyDossard(String ravito) async {
+  Future<Map<String, Map<int, List<String>>>> getTempsOrderedbyDossard(
+      String ravito) async {
     final db = await instance.database;
     final result;
     if (ravito != 'admin') {
@@ -465,11 +498,17 @@ class DatabaseManager {
     return data;
   }
 
-  Future<Map<String,Map<String,int>>> compteTemps(String ravito) async {
+  Future<Map<String, Map<String, int>>> compteTemps(String ravito) async {
     final epreuves = await readJsonEpreuves(ravito);
     final c = await countEquipes();
     final List<String> list_parcours = await getParcours();
-    Map<String,Map<String,int>> data = {for (var parcours in list_parcours) parcours : {for (var epreuve in (epreuves[parcours]!)) epreuve : (epreuve==epreuves[parcours]![0] ? c[parcours]! : 0) }};
+    Map<String, Map<String, int>> data = {
+      for (var parcours in list_parcours)
+        parcours: {
+          for (var epreuve in (epreuves[parcours]!))
+            epreuve: (epreuve == epreuves[parcours]![0] ? c[parcours]! : 0)
+        }
+    };
     final db = await instance.database;
     final result;
 
@@ -499,11 +538,13 @@ class DatabaseManager {
       ''');
     }
 
-    final counts = result.map((row) => {
-      'parcours': row['parcours'].toString(),
-      'time_count': row['time_count'].toString(),
-      'dossard_count': row['dossard_count'].toString(),
-    }).toList();
+    final counts = result
+        .map((row) => {
+              'parcours': row['parcours'].toString(),
+              'time_count': row['time_count'].toString(),
+              'dossard_count': row['dossard_count'].toString(),
+            })
+        .toList();
 
     for (var count in counts) {
       final parcours = count["parcours"]!;
@@ -523,7 +564,8 @@ class DatabaseManager {
     return data;
   }
 
-  Future<List<int>> compteDossard(String parcours, String epreuve, String ravito) async {
+  Future<List<int>> compteDossard(
+      String parcours, String epreuve, String ravito) async {
     final db = await instance.database;
     final epreuves = (await readJsonEpreuves(ravito))[parcours] as List<String>;
     final targetTimeCount = epreuves.indexOf(epreuve);
@@ -546,9 +588,11 @@ class DatabaseManager {
         ''');
       }
 
-      final dossardsAvecTemps = result.map((row) => row[TempsField.dossard] as int).toSet();
-      return equipes.where((dossard) => !dossardsAvecTemps.contains(dossard)).toList();
-
+      final dossardsAvecTemps =
+          result.map((row) => row[TempsField.dossard] as int).toSet();
+      return equipes
+          .where((dossard) => !dossardsAvecTemps.contains(dossard))
+          .toList();
     } else {
       final result;
       if (ravito != 'admin') {
@@ -573,7 +617,7 @@ class DatabaseManager {
     }
   }
 
-  Future<Map<String,List<Map<String, String>>>> compteTempsManquants() async { 
+  Future<Map<String, List<Map<String, String>>>> compteTempsManquants() async {
     final db = await instance.database;
     final result = await db.rawQuery('''
       SELECT 
@@ -600,7 +644,9 @@ class DatabaseManager {
 
     final nb_epr = await compteEpreuves();
     final List<String> list_parcours = await getParcours();
-    Map<String,List<Map<String, String>>> temps_manquants = {for (var parcours in list_parcours) parcours: []};
+    Map<String, List<Map<String, String>>> temps_manquants = {
+      for (var parcours in list_parcours) parcours: []
+    };
 
     for (var p in data.keys) {
       for (var d in data[p]!.entries) {
@@ -615,7 +661,7 @@ class DatabaseManager {
             if (i != 2) {
               temps_manquants[p]!.add({
                 'dossard': d.key.toString(),
-                'ravito': nb_epr[p]!.keys.toList()[e_i-1],
+                'ravito': nb_epr[p]!.keys.toList()[e_i - 1],
                 'nb': nb.toString()
               });
             }
@@ -624,9 +670,10 @@ class DatabaseManager {
             if (i != 2) {
               temps_manquants[p]!.add({
                 'dossard': d.key.toString(),
-                'ravito': nb_epr[p]!.keys.toList()[e_i-1],
+                'ravito': nb_epr[p]!.keys.toList()[e_i - 1],
                 'nb': nb.toString()
-              });            }
+              });
+            }
             i = 1;
           }
           nb = e.value - d.value[e.key];
@@ -644,7 +691,7 @@ class DatabaseManager {
     final json = r.toJson();
     await db.insert(tableRemarque, json);
   }
-  
+
   Future<List<Remarque>> getRemarque(String ravito) async {
     final db = await instance.database;
     final result;
@@ -662,7 +709,8 @@ class DatabaseManager {
         ORDER BY ${RemarqueField.date} ASC
       ''');
     }
-    List<Remarque> r = result.map<Remarque>((e) => Remarque.fromJson(e)).toList();
+    List<Remarque> r =
+        result.map<Remarque>((e) => Remarque.fromJson(e)).toList();
     return r;
   }
 }

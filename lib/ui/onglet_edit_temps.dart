@@ -37,13 +37,17 @@ class OngletEditTemps extends HookWidget {
 
         if (dropdown.value == null && list_parcours.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            dropdown.value = {for (var parcours in list_parcours) parcours: true};
+            dropdown.value = {
+              for (var parcours in list_parcours) parcours: true
+            };
           });
         }
- 
-        final Map<String, ScrollController> scrollController = {for (var parcours in list_parcours) parcours: ScrollController()};
+
+        final Map<String, ScrollController> scrollController = {
+          for (var parcours in list_parcours) parcours: ScrollController()
+        };
         final ScrollController verticalScrollController = ScrollController();
-        
+
         return FutureBuilder<List<Object>>(
           future: Future.wait([
             dbm.getTempsOrderedbyDossard(ravito),
@@ -57,11 +61,11 @@ class OngletEditTemps extends HookWidget {
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return const Center(child: Text('Aucune donnée disponible'));
             }
-            
+
             final data = snapshot.data as List;
             final temps = data[0] as Map<String, dynamic>;
             final epreuves = data[1] as Map<String, dynamic>;
-            
+
             return SingleChildScrollView(
               controller: verticalScrollController,
               scrollDirection: Axis.vertical,
@@ -80,10 +84,13 @@ class OngletEditTemps extends HookWidget {
                         ),
                         TextButton(
                           onPressed: () {
-                            dropdown.value![parcours] = !dropdown.value![parcours]!;
+                            dropdown.value![parcours] =
+                                !dropdown.value![parcours]!;
                             refresh.value = !refresh.value;
                           },
-                          child: dropdown.value![parcours]! ? const Icon(Icons.keyboard_arrow_up) : const Icon(Icons.keyboard_arrow_down),
+                          child: dropdown.value![parcours]!
+                              ? const Icon(Icons.keyboard_arrow_up)
+                              : const Icon(Icons.keyboard_arrow_down),
                         ),
                       ],
                     ),
@@ -113,23 +120,28 @@ class OngletEditTemps extends HookWidget {
                             //print(-event.delta.dy);
                           }
                         },
-                      child: Scrollbar(
-                        controller: scrollController[parcours],
-                        thumbVisibility: true,
-                        child: SingleChildScrollView(
+                        child: Scrollbar(
                           controller: scrollController[parcours],
-                          scrollDirection: Axis.horizontal,
-                          child: Builder(
-                            builder: (context) {
-                              double w = max(((epreuves[parcours].length + 2) * (kIsMobile ? 80 : 120)).toDouble(), MediaQuery.of(context).size.width);
-                              return SizedBox(
-                                width: w,
-                                child: grid(epreuves[parcours], temps[parcours], kIsMobile, refresh, w),
-                              );
-                            },
+                          thumbVisibility: true,
+                          child: SingleChildScrollView(
+                            controller: scrollController[parcours],
+                            scrollDirection: Axis.horizontal,
+                            child: Builder(
+                              builder: (context) {
+                                double w = max(
+                                    ((epreuves[parcours].length + 2) *
+                                            (kIsMobile ? 80 : 120))
+                                        .toDouble(),
+                                    MediaQuery.of(context).size.width);
+                                return SizedBox(
+                                  width: w,
+                                  child: grid(epreuves[parcours],
+                                      temps[parcours], kIsMobile, refresh, w),
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ),
                       ),
                     const SizedBox(height: 10),
                   ],
@@ -143,89 +155,94 @@ class OngletEditTemps extends HookWidget {
   }
 
   Widget grid(epreuves, temps, kIsMobile, refresh, w) {
-    return  GridView.builder(
+    return GridView.builder(
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: epreuves.length + 2,
-        childAspectRatio: w/(epreuves.length + 2)/50,
+        childAspectRatio: w / (epreuves.length + 2) / 50,
       ),
       itemCount: epreuves.length + 2 + temps.length * (epreuves.length + 2),
       itemBuilder: (context, index) {
         int rowIndex = index ~/ (epreuves.length + 2);
         int colIndex = (index % (epreuves.length + 2)).toInt();
-    
+
         return Container(
-          decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: Colors.black, width: 0.5)),
-          ),
-          child: () {
-            if (rowIndex == 0) {
-              if (index == 0) {
+            decoration: BoxDecoration(
+              border:
+                  Border(bottom: BorderSide(color: Colors.black, width: 0.5)),
+            ),
+            child: () {
+              if (rowIndex == 0) {
+                if (index == 0) {
+                  return Center(
+                    child: Text(
+                      "Dossard",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                } else if (index <= epreuves.length) {
+                  return Center(
+                    child: Text(
+                      kIsMobile
+                          ? epreuves[index - 1].replaceFirst(' ', '\n')
+                          : epreuves[index - 1],
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                } else {
+                  return Container();
+                }
+              }
+
+              final item = temps!.entries.elementAt(rowIndex - 1);
+
+              if (colIndex == 0) {
                 return Center(
                   child: Text(
-                    "Dossard",
+                    item.key.toString(),
                     style: const TextStyle(fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
                   ),
                 );
-              } else if (index <= epreuves.length) {
-                return Center(
-                  child: Text(
-                    kIsMobile? epreuves[index - 1].replaceFirst(' ', '\n') : epreuves[index - 1],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                );
+              } else if (colIndex <= epreuves.length) {
+                int epreuveIndex = colIndex - 1;
+                if (item.value.length > epreuveIndex) {
+                  return Center(
+                    child: Text(
+                      dateToFormat(item.value[epreuveIndex]),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                } else {
+                  return const Center(child: Text('-'));
+                }
               } else {
-                return Container();
-              }
-            }
-        
-            final item = temps!.entries.elementAt(rowIndex-1);
-        
-            if (colIndex == 0) {
-              return Center(
-                child: Text(
-                  item.key.toString(),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              );
-            } else if (colIndex <= epreuves.length) {
-              int epreuveIndex = colIndex - 1;
-              if (item.value.length > epreuveIndex) {
                 return Center(
-                  child: Text(dateToFormat(item.value[epreuveIndex]), textAlign: TextAlign.center,),
-                );
-              } else {
-                return const Center(child: Text('-'));
-              }
-            } else {
-              return Center(
-                child: SizedBox(
-                  width: 100,
-                  height: 30,
-                  child: ElevatedButton(
-                    child: const Text("Editer"),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: true,
-                        builder: (BuildContext context) {
-                          return PopupEditTemps(
-                            dossard: item.key.toString(),
-                            date: '',
-                            ravito: ravito,
-                            refresher: refresh,
-                          );
-                        },
-                      );
-                    },
+                  child: SizedBox(
+                    width: 100,
+                    height: 30,
+                    child: ElevatedButton(
+                      child: const Text("Editer"),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          builder: (BuildContext context) {
+                            return PopupEditTemps(
+                              dossard: item.key.toString(),
+                              date: '',
+                              ravito: ravito,
+                              refresher: refresh,
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
-              );
-            }
-          }()
-        );
+                );
+              }
+            }());
       },
     );
   }

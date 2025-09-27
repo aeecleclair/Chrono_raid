@@ -61,7 +61,8 @@ class JsonFolderStorage {
   }
 
   /// Vérifie si le contenu a changé par rapport au fichier existant.
-  Future<bool> isContentChanged(String filename, Map<String, dynamic> newContent) async {
+  Future<bool> isContentChanged(
+      String filename, Map<String, dynamic> newContent) async {
     final file = await _getFile(filename);
     if (!(await file.exists())) {
       return true;
@@ -71,8 +72,7 @@ class JsonFolderStorage {
       final existing = await file.readAsString();
       final existingJson = jsonDecode(existing);
 
-      return !const DeepCollectionEquality()
-          .equals(existingJson, newContent);
+      return !const DeepCollectionEquality().equals(existingJson, newContent);
     } catch (_) {
       return true;
     }
@@ -81,12 +81,24 @@ class JsonFolderStorage {
 
 void json_initialisation() async {
   final storage = JsonFolderStorage('json_data');
-  if (!await storage.jsonExists('Epreuves') || await storage.readJson('Epreuves') == '{}') {
+  if (!await storage.jsonExists('Epreuves') ||
+      await storage.readJson('Epreuves') == '{}') {
     print('Remise à défault des json');
-    await storage.writeJson('Epreuves', {'Default': {"Epreuves": {"Parcours": ["départ 1", "Arrivée 1"]}}});
+    await storage.writeJson('Epreuves', {
+      'Default': {
+        "Epreuves": {
+          "Parcours": ["départ 1", "Arrivée 1"]
+        }
+      }
+    });
   }
-  if (!await storage.jsonExists('Equipes') || await storage.readJson('Equipes') == '{}') {
-    await storage.writeJson('Equipes', {"Equipes": [{"dossard": "0","parcours": "Parcours"}]}); 
+  if (!await storage.jsonExists('Equipes') ||
+      await storage.readJson('Equipes') == '{}') {
+    await storage.writeJson('Equipes', {
+      "Equipes": [
+        {"dossard": "0", "parcours": "Parcours"}
+      ]
+    });
   }
 }
 
@@ -99,7 +111,6 @@ Future<String> loadJsonEpreuves() async {
   final storage = JsonFolderStorage('json_data');
   return await storage.readJson('Epreuves');
 }
-
 
 Future<bool> jsonIsChanged(String filename, Map<String, dynamic> data) async {
   final storage = JsonFolderStorage('json_data');

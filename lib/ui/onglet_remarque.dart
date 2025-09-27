@@ -7,18 +7,23 @@ import 'database.dart';
 
 class OngletRemarque extends HookWidget {
   final String ravito;
-  OngletRemarque(this.ravito, {super.key,});
+  OngletRemarque(
+    this.ravito, {
+    super.key,
+  });
   final TextEditingController _controllerRemarque = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-      final dbm = DatabaseManager();
+    final dbm = DatabaseManager();
 
     void envoyer() async {
       String remarque_text = _controllerRemarque.text;
-      await dbm.createRemarque(Remarque(DateTime.now().toIso8601String(), ravito, remarque_text));
+      await dbm.createRemarque(
+          Remarque(DateTime.now().toIso8601String(), ravito, remarque_text));
       _controllerRemarque.clear();
-      notif(context, 'Remarque ajoutée !', Colors.green, Icons.check_circle_outline);
+      notif(context, 'Remarque ajoutée !', Colors.green,
+          Icons.check_circle_outline);
     }
 
     return Center(

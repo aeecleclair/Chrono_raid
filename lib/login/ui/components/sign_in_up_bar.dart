@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:heroicons/heroicons.dart';
 import 'package:chrono_raid/tools/ui/widgets/loader.dart';
 import 'package:chrono_raid/tools/ui/builders/waiting_button.dart';
 

@@ -1,9 +1,7 @@
-
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:chrono_raid/ui/functions.dart';
 import 'package:crypto/crypto.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,9 +14,7 @@ import 'package:chrono_raid/auth/repository/openid_repository.dart';
 import 'package:chrono_raid/tools/cache/cache_manager.dart';
 import 'package:chrono_raid/tools/repository/repository.dart';
 import 'dart:convert';
-import 'package:universal_html/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
-
 
 final authTokenProvider =
     StateNotifierProvider<OpenIdTokenProvider, AsyncValue<Map<String, String>>>(
@@ -111,6 +107,7 @@ final tokenProvider = Provider((ref) {
         orElse: () => "",
       );
 });
+
 class OpenIdTokenProvider
     extends StateNotifier<AsyncValue<Map<String, String>>> {
   final OpenIdRepository openIdRepository = OpenIdRepository();
@@ -121,7 +118,7 @@ class OpenIdTokenProvider
   final String refreshTokenKey = "refresh_token";
   final List<String> scopes = ["API"];
   final FlutterAppAuth appAuth = const FlutterAppAuth();
-  final String redirectUrl = "chronoraid://authorized";   // TODO :
+  final String redirectUrl = "chronoraid://authorized"; // TODO :
   final String redirectUrlHost = InternetAddress.loopbackIPv4.address;
   final int redirectUrlPort = 8001;
   final String discoveryUrl =
@@ -153,11 +150,12 @@ class OpenIdTokenProvider
         final codeVerifier = generateRandomString(128);
         final codeChallenge = hash(codeVerifier);
 
-        startLocalServer(redirectUri.toString(), redirectUrlHost, redirectUrlPort, codeVerifier);
+        startLocalServer(redirectUri.toString(), redirectUrlHost,
+            redirectUrlPort, codeVerifier);
 
-        final Uri monUrl = Uri.parse("${Repository.host}auth/authorize?client_id=$clientId&response_type=code&scope=API&redirect_uri=http://$redirectUrlHost:$redirectUrlPort/static.html&code_challenge=$codeChallenge&code_challenge_method=S256");
+        final Uri monUrl = Uri.parse(
+            "${Repository.host}auth/authorize?client_id=$clientId&response_type=code&scope=API&redirect_uri=http://$redirectUrlHost:$redirectUrlPort/static.html&code_challenge=$codeChallenge&code_challenge_method=S256");
 
-        
         if (await canLaunchUrl(monUrl)) {
           await launchUrl(monUrl, mode: LaunchMode.externalApplication);
         } else {
@@ -185,13 +183,16 @@ class OpenIdTokenProvider
     }
   }
 
-  void startLocalServer(String redirectUri, String redirectUrlHost, int redirectUrlPort, String codeVerifier) async {
-    final server = await HttpServer.bind(InternetAddress(redirectUrlHost), redirectUrlPort);
+  void startLocalServer(String redirectUri, String redirectUrlHost,
+      int redirectUrlPort, String codeVerifier) async {
+    final server = await HttpServer.bind(
+        InternetAddress(redirectUrlHost), redirectUrlPort);
     print("Serveur local démarré : $redirectUrlHost:$redirectUrlPort");
 
     await for (HttpRequest request in server) {
       final uri = request.uri;
-      if (uri.path == "/static.html" && uri.queryParameters.containsKey('code')) {
+      if (uri.path == "/static.html" &&
+          uri.queryParameters.containsKey('code')) {
         final code = uri.queryParameters['code'] ?? "";
         print("Code reçu : $code");
         _exchangeCodeForToken(code, redirectUri, codeVerifier);
@@ -200,7 +201,8 @@ class OpenIdTokenProvider
         request.response
           ..statusCode = 200
           ..headers.contentType = ContentType.html
-          ..write('<html><head><title>Connexion réussie</title></head><body>Connexion réussie. Vous pouvez fermer cette fenêtre.</body></html>');
+          ..write(
+              '<html><head><title>Connexion réussie</title></head><body>Connexion réussie. Vous pouvez fermer cette fenêtre.</body></html>');
         await request.response.close();
 
         // Arrêter le serveur après réception du code
@@ -211,7 +213,8 @@ class OpenIdTokenProvider
     }
   }
 
-  Future<void> _exchangeCodeForToken(String code, String redirectUri, String codeVerifier) async {
+  Future<void> _exchangeCodeForToken(
+      String code, String redirectUri, String codeVerifier) async {
     try {
       final resp = await openIdRepository.getToken(
         code,
@@ -231,7 +234,6 @@ class OpenIdTokenProvider
 
       print("Access Token : $accessToken");
       print("Refresh Token : $refreshToken");
-      
     } catch (e) {
       print("Erreur lors de l'échange du code : $e");
     }

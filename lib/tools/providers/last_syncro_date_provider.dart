@@ -8,6 +8,7 @@ class LastSynchroDateNotifier extends StateNotifier<String> {
   }
 }
 
-final lastSynchroDateProvider = StateNotifierProvider<LastSynchroDateNotifier, String>((ref) {
+final lastSynchroDateProvider =
+    StateNotifierProvider<LastSynchroDateNotifier, String>((ref) {
   return LastSynchroDateNotifier();
 });

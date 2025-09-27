@@ -29,26 +29,23 @@ class Remarque {
     ravito = Ravito;
     text = Text;
   }
-  
+
   @override
-  String toString(){
+  String toString() {
     return "Remarque(id: $id, date: $date, ravito: $ravito, text: $text)";
   }
 
-  static Remarque fromJson(Map<String, Object?> json) =>
-    Remarque(
+  static Remarque fromJson(Map<String, Object?> json) => Remarque(
         json[RemarqueField.date] as String,
         json[RemarqueField.ravito] as String,
         json[RemarqueField.text] as String,
         Id: json[RemarqueField.id] as String,
       );
 
-  Map<String, Object> toJson() =>
-    {
-      RemarqueField.id: id,
-      RemarqueField.date: date,
-      RemarqueField.ravito: ravito,
-      RemarqueField.text: text,
-    };
-
+  Map<String, Object> toJson() => {
+        RemarqueField.id: id,
+        RemarqueField.date: date,
+        RemarqueField.ravito: ravito,
+        RemarqueField.text: text,
+      };
 }

@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:chrono_raid/ui/temps.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:chrono_raid/tools/cache/cache_manager.dart';
 import 'package:chrono_raid/tools/exception.dart';
 
 abstract class Repository {
-  static const String host =  "http://localhost:8000/"; //"https://hyperion-4.dev.eclair.ec-lyon.fr/";"http://localhost:8000/";"http://172.20.10.2:8000/"; "https://hyperion.dev.eclair.ec-lyon.fr/";
+  static const String host =
+      "http://localhost:8000/"; //"https://hyperion-4.dev.eclair.ec-lyon.fr/";"http://localhost:8000/";"http://172.20.10.2:8000/"; "https://hyperion.dev.eclair.ec-lyon.fr/";
   static const String expiredTokenDetail = "Could not validate credentials";
   final String ext = "";
   final Map<String, String> headers = {
@@ -16,8 +16,7 @@ abstract class Repository {
   };
   final cacheManager = CacheManager();
 
-  void initLogger() {
-  }
+  void initLogger() {}
 
   void setToken(String token) {
     headers["Authorization"] = 'Bearer $token';
@@ -52,7 +51,6 @@ abstract class Repository {
         } on AppException {
           rethrow;
         } catch (e) {
-
           throw AppException(ErrorType.notFound, response.body);
         }
       } else {
@@ -154,7 +152,6 @@ abstract class Repository {
         throw AppException(ErrorType.notFound, decoded["detail"]);
       }
     } else {
-
       throw AppException(ErrorType.notFound, response.body);
     }
   }

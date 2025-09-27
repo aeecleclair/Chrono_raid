@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:heroicons/heroicons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:chrono_raid/auth/providers/openid_provider.dart';
 import 'package:chrono_raid/login/tools/constants.dart';
@@ -67,19 +66,19 @@ class AppSignIn extends HookConsumerWidget {
                           onPressed: () async {
                             await authNotifier.getTokenFromRequest();
                             ref.watch(authTokenProvider).when(
-                              data: (token) {
-                                QR.to(pathForwarding.path);
-                              },
-                              error: (e, s) {
-                                print(e);
-                                displayToast(
-                                  context,
-                                  TypeMsg.error,
-                                  LoginTextConstants.loginFailed,
+                                  data: (token) {
+                                    QR.to(pathForwarding.path);
+                                  },
+                                  error: (e, s) {
+                                    print(e);
+                                    displayToast(
+                                      context,
+                                      TypeMsg.error,
+                                      LoginTextConstants.loginFailed,
+                                    );
+                                  },
+                                  loading: () {},
                                 );
-                              },
-                              loading: () {},
-                            );
                           },
                           color: ColorConstants.background2,
                           icon: const Icon(

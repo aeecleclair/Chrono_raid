@@ -32,15 +32,9 @@ class Temps {
   bool status = true;
   String last_modification_date = "";
 
-  Temps(
-    int Dossard,
-    String Date,
-    String Parcours,
-    String Ravito,
-    bool status,
-    String Last_modification_date,
-    {String Id = ""}
-  ) {
+  Temps(int Dossard, String Date, String Parcours, String Ravito, bool status,
+      String Last_modification_date,
+      {String Id = ""}) {
     id = Id.isEmpty ? Uuid().v4() : Id;
     dossard = Dossard;
     date = Date;
@@ -51,12 +45,11 @@ class Temps {
   }
 
   @override
-  String toString(){
+  String toString() {
     return "Temps(id: $id, dossard: $dossard, parcours: $parcours, ravito: $ravito, date: $date, status: $status, last modification date: $last_modification_date)";
   }
 
-  static Temps fromJson(Map<String, Object?> json) =>
-    Temps(
+  static Temps fromJson(Map<String, Object?> json) => Temps(
         json[TempsField.dossard] as int,
         json[TempsField.date] as String,
         json[TempsField.parcours] as String,
@@ -66,15 +59,13 @@ class Temps {
         Id: json[TempsField.id] as String,
       );
 
-  Map<String, Object> toJson() =>
-    {
-      TempsField.id: id,
-      TempsField.dossard: dossard,
-      TempsField.date: date,
-      TempsField.parcours: parcours,
-      TempsField.ravito: ravito,
-      TempsField.status: status ? 1 : 0,
-      TempsField.last_modification_date: last_modification_date,
-    };
-
+  Map<String, Object> toJson() => {
+        TempsField.id: id,
+        TempsField.dossard: dossard,
+        TempsField.date: date,
+        TempsField.parcours: parcours,
+        TempsField.ravito: ravito,
+        TempsField.status: status ? 1 : 0,
+        TempsField.last_modification_date: last_modification_date,
+      };
 }

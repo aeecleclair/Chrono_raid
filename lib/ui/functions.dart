@@ -10,27 +10,23 @@ import 'package:chrono_raid/ui/json_folder_storage.dart';
 import 'package:chrono_raid/ui/remarque.dart';
 import 'package:chrono_raid/ui/temps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:chrono_raid/tools/constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
-
-Future<List<Map<String,String>>> readJsonEquipes() async {
+Future<List<Map<String, String>>> readJsonEquipes() async {
   final String response = await loadJsonEquipes();
   final List<dynamic> data = await json.decode(response)["Equipes"];
-  final List<Map<String,String>> data2 = data.map(
-    (item) => {
-    "dossard": item["dossard"] as String, 
-    "parcours": item["parcours"] as String,
-    }
-    ).toList();
+  final List<Map<String, String>> data2 = data
+      .map((item) => {
+            "dossard": item["dossard"] as String,
+            "parcours": item["parcours"] as String,
+          })
+      .toList();
   return data2;
 }
-
 
 Future<List<String>> getParcours({String? ravito}) async {
   final String response = await loadJsonEpreuves();
@@ -74,7 +70,9 @@ Future compteEpreuves() async {
   final String response = await loadJsonEpreuves();
   final d = json.decode(response);
   final List<String> list_parcours = await getParcours();
-  final Map<String, dynamic> data = {for (var parcours in list_parcours) parcours: {}};
+  final Map<String, dynamic> data = {
+    for (var parcours in list_parcours) parcours: {}
+  };
   for (var r in d.keys) {
     for (var p in list_parcours) {
       data[p][r] = d[r]["Epreuves"][p].length;
@@ -92,9 +90,10 @@ Future<List<String>> getRavitos() async {
 String dateToFormat(String date) {
   if (date == '-') {
     return '-';
-  }
-  else {
-    return kIsMobile ? DateFormat('dd/MM\nH:m:s').format(DateTime.parse(date)) : DateFormat('dd/MM - H:m:s').format(DateTime.parse(date));
+  } else {
+    return kIsMobile
+        ? DateFormat('dd/MM\nH:m:s').format(DateTime.parse(date))
+        : DateFormat('dd/MM - H:m:s').format(DateTime.parse(date));
   }
 }
 
@@ -105,7 +104,6 @@ enum ActionType {
   Delete,
   Edit,
 }
-
 
 final Map<ActionType, String> actionTypeToStringMap = {
   for (var at in ActionType.values) at: at.toString().split('.').last
@@ -129,7 +127,7 @@ Future<bool> jsonHasChanged() async {
   final data_epreuves = await jsonRepository.getJson("Epreuves");
   final data_equipes = await jsonRepository.getJson("Equipes");
 
-  bool epreuvesHasChanged =  await jsonIsChanged("Epreuves", data_epreuves);
+  bool epreuvesHasChanged = await jsonIsChanged("Epreuves", data_epreuves);
   bool equipesHasChanged = await jsonIsChanged("Equipes", data_equipes);
 
   return epreuvesHasChanged || equipesHasChanged;
@@ -154,9 +152,10 @@ Future<void> synchronisation(String last_syncro_date) async {
   List<Temps> list_temps = await dbm.getTempsSince(last_syncro_date);
 
   List<dynamic> list_new_temps = (await repository.create(
-    list_temps.map((t) => t.toJson()).toList(),
-    suffix: 'chrono_raid/temps/$last_syncro_date'
-  )).map((t) => Temps.fromJson(t)).toList();
+          list_temps.map((t) => t.toJson()).toList(),
+          suffix: 'chrono_raid/temps/$last_syncro_date'))
+      .map((t) => Temps.fromJson(t))
+      .toList();
 
   for (var t in list_new_temps) {
     final existing_t = await dbm.getTempsbyId(t.id);
@@ -165,7 +164,7 @@ Future<void> synchronisation(String last_syncro_date) async {
     } else {
       await dbm.addTemps(t);
     }
-  }  
+  }
 
   // await dbm.deleteTempsSince(last_syncro_date);
   // await dbm.addListTemps(list_new_temps);
@@ -174,24 +173,26 @@ Future<void> synchronisation(String last_syncro_date) async {
 
   List<Remarque> list_remarques_local = await dbm.getRemarque('admin');
 
-  List<Remarque> list_remarques_serv = (await repository.getList(
-    suffix: 'chrono_raid/remarks'
-  )).map((r) => Remarque.fromJson(r)).toList();
+  List<Remarque> list_remarques_serv =
+      (await repository.getList(suffix: 'chrono_raid/remarks'))
+          .map((r) => Remarque.fromJson(r))
+          .toList();
 
   final ids_serv = list_remarques_serv.map((e) => e.id).toSet();
   final ids_local = list_remarques_local.map((e) => e.id).toSet();
 
-  List<Remarque> list_serv_minus_local = list_remarques_serv.where((obj) => !ids_local.contains(obj.id)).toList();
-  List<Remarque> list_local_minus_serv = list_remarques_local.where((obj) => !ids_serv.contains(obj.id)).toList();
+  List<Remarque> list_serv_minus_local =
+      list_remarques_serv.where((obj) => !ids_local.contains(obj.id)).toList();
+  List<Remarque> list_local_minus_serv =
+      list_remarques_local.where((obj) => !ids_serv.contains(obj.id)).toList();
 
   for (var r in list_serv_minus_local) {
     dbm.createRemarque(r);
   }
   if (list_local_minus_serv.isNotEmpty) {
     await repository.create(
-      list_local_minus_serv.map((r) => r.toJson()).toList(),
-      suffix: "chrono_raid/remarks"
-    );
+        list_local_minus_serv.map((r) => r.toJson()).toList(),
+        suffix: "chrono_raid/remarks");
   }
 }
 
@@ -199,11 +200,11 @@ void download_csv() async {
   CsvRepository csvRepository = CsvRepository();
 
   for (var parcours in await getParcours()) {
-
-    csvRepository.getCsv(suffix: 'chrono_raid/csv_temps/$parcours').then((csvData) async {
-
+    csvRepository
+        .getCsv(suffix: 'chrono_raid/csv_temps/$parcours')
+        .then((csvData) async {
       final directory;
-      
+
       if (kIsDesktop) {
         directory = await getDownloadsDirectory();
       } else {
@@ -215,7 +216,6 @@ void download_csv() async {
 
       final file = File(path);
       await file.writeAsString(csvData);
-
     }).catchError((error) {
       print('Error: $error');
     });

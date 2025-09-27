@@ -10,7 +10,10 @@ import 'package:toastification/toastification.dart';
 
 class OngletDossardUnique extends HookWidget {
   final String ravito;
-  OngletDossardUnique(this.ravito, {super.key,});
+  OngletDossardUnique(
+    this.ravito, {
+    super.key,
+  });
 
   final TextEditingController controllerDossard = TextEditingController();
 
@@ -19,17 +22,19 @@ class OngletDossardUnique extends HookWidget {
     final dossard = useState('');
     final textFieldFocus = useFocusNode();
     final dbm = DatabaseManager();
-    
+
     void envoyer() async {
       String dossard_str = controllerDossard.text;
       dossard.value = dossard_str;
       if (dossard_str != '' && await dbm.valideDossard(dossard_str)) {
-          final String now = DateTime.now().toIso8601String();
+        final String now = DateTime.now().toIso8601String();
         try {
           controllerDossard.clear();
-          await dbm.createTemps(Temps(int.parse(dossard_str), now, await dbm.getParcoursByDossard(dossard_str), ravito, true, now));
-          notif(context, 'Temps ajouté !', Colors.green, Icons.check_circle_outline);
-        } catch(e) {
+          await dbm.createTemps(Temps(int.parse(dossard_str), now,
+              await dbm.getParcoursByDossard(dossard_str), ravito, true, now));
+          notif(context, 'Temps ajouté !', Colors.green,
+              Icons.check_circle_outline);
+        } catch (e) {
           toastification.show(
             context: context,
             title: Container(
@@ -40,9 +45,15 @@ class OngletDossardUnique extends HookWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Ligne du dossard pleine',),
-                  Text('Temps non ajouté',),
-                  Text('Cliquer pour résoudre',),
+                  Text(
+                    'Ligne du dossard pleine',
+                  ),
+                  Text(
+                    'Temps non ajouté',
+                  ),
+                  Text(
+                    'Cliquer pour résoudre',
+                  ),
                 ],
               ),
             ),
@@ -54,14 +65,19 @@ class OngletDossardUnique extends HookWidget {
             alignment: kIsMobile ? Alignment.topLeft : Alignment.bottomRight,
             callbacks: ToastificationCallbacks(
               onTap: (toastItem) {
-                showDialog(context: context, barrierDismissible: false, builder: (BuildContext context) {return PopupEditTemps(dossard: dossard_str, ravito: ravito, date: now);});
+                showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return PopupEditTemps(
+                          dossard: dossard_str, ravito: ravito, date: now);
+                    });
               },
             ),
             showProgressBar: false,
           );
         }
-      }
-      else {
+      } else {
         notif(context, 'Dossard non valide', Colors.red, Icons.cancel_outlined);
       }
       FocusScope.of(context).requestFocus(textFieldFocus);
@@ -70,7 +86,8 @@ class OngletDossardUnique extends HookWidget {
     return KeyboardListener(
       focusNode: useFocusNode(),
       onKeyEvent: (KeyEvent event) {
-        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.enter) {
           envoyer();
         }
       },
@@ -96,7 +113,9 @@ class OngletDossardUnique extends HookWidget {
                 ],
               ),
             ),
-            SizedBox(height: 20,),
+            SizedBox(
+              height: 20,
+            ),
             FloatingActionButton(
               onPressed: envoyer,
               child: const Text('Envoyer'),
