@@ -118,7 +118,7 @@ class OpenIdTokenProvider
   final String refreshTokenKey = "refresh_token";
   final List<String> scopes = ["API"];
   final FlutterAppAuth appAuth = const FlutterAppAuth();
-  final String redirectUrl = "chronoraid://authorized"; // TODO :
+  final String redirectUrl = "com.example.chronoraid://authorized"; // TODO :
   final String redirectUrlHost = InternetAddress.loopbackIPv4.address;
   final int redirectUrlPort = 8001;
   final String discoveryUrl =
