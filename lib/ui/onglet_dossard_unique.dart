@@ -1,4 +1,5 @@
 import 'package:chrono_raid/ui/database.dart';
+import 'package:chrono_raid/ui/equipes.dart';
 import 'package:chrono_raid/ui/functions.dart';
 import 'package:chrono_raid/ui/popup_edit_temps.dart';
 import 'package:chrono_raid/ui/temps.dart';
@@ -26,12 +27,15 @@ class OngletDossardUnique extends HookWidget {
     void envoyer() async {
       String dossard_str = controllerDossard.text;
       dossard.value = dossard_str;
-      if (dossard_str != '' && await dbm.valideDossard(dossard_str)) {
+      String parcours = await dbm.getParcoursByDossard(dossard_str);
+      if (!(await getParcours(ravito: ravito)).contains(parcours)) {
+        notif(context, 'Parcous non disponible', Colors.red, Icons.cancel_outlined);
+      } else if (dossard_str != '' && await dbm.valideDossard(dossard_str)) {
         final String now = DateTime.now().toIso8601String();
         try {
           controllerDossard.clear();
           await dbm.createTemps(Temps(int.parse(dossard_str), now,
-              await dbm.getParcoursByDossard(dossard_str), ravito, true, now));
+              parcours, ravito, true, now));
           notif(context, 'Temps ajouté !', Colors.green,
               Icons.check_circle_outline);
         } catch (e) {

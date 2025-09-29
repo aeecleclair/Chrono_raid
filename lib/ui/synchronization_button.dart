@@ -85,21 +85,21 @@ class SynchronizationDialog extends ConsumerWidget {
                       );
                       if (confirmReset == true) {
                         try {
-                          await dbm.resetBDD();
-                          notif(context, 'Base de données réinitialisée !',
-                              Colors.green, Icons.check_circle_outline);
-                        } catch (e) {
-                          notif(context, e.toString(), Colors.red,
-                              Icons.cancel_outlined);
-                        }
-
-                        try {
                           await jsonUpdate();
                           notif(
                               context,
                               'Fichier de configuration mis à jour !',
                               Colors.green,
                               Icons.check_circle_outline);
+                        } catch (e) {
+                          notif(context, e.toString(), Colors.red,
+                              Icons.cancel_outlined);
+                        }
+                        
+                        try {
+                          await dbm.resetBDD();
+                          notif(context, 'Base de données réinitialisée !',
+                              Colors.green, Icons.check_circle_outline);
                         } catch (e) {
                           notif(context, e.toString(), Colors.red,
                               Icons.cancel_outlined);

@@ -27,7 +27,7 @@ class OngletDossardGroupe extends HookWidget {
     }
 
     return FutureBuilder<List<String>>(
-      future: getParcours(),
+      future: getParcours(ravito: ravito),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

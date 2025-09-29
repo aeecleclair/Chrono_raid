@@ -17,7 +17,7 @@ class OngletEditAction extends HookWidget {
     final refresh = useState(false);
 
     return FutureBuilder<List<Object>>(
-      future: dbm.getAction(ravito),
+      future: dbm.getActions(ravito),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -33,7 +33,7 @@ class OngletEditAction extends HookWidget {
             const SizedBox(
               height: 30,
             ),
-            ElevatedButton(
+            if (data.isNotEmpty) ElevatedButton(
                 child: const Column(
                   children: [
                     SizedBox(
@@ -76,7 +76,8 @@ class OngletEditAction extends HookWidget {
                               ),
                             ]);
                       });
-                }),
+                }
+              ),
             const SizedBox(
               height: 20,
             ),

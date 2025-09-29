@@ -29,10 +29,17 @@ Future<List<Map<String, String>>> readJsonEquipes() async {
 }
 
 Future<List<String>> getParcours({String? ravito}) async {
-  final String response = await loadJsonEpreuves();
-  Map<String, dynamic> data = jsonDecode(response);
-  if (ravito != null) {
-    return data[ravito]?['Epreuves']?.keys.toList() ?? [];
+  Map<String, dynamic> data = jsonDecode(await loadJsonEpreuves());
+  if (ravito != null && ravito != 'admin') {
+    final epreuves = data[ravito]?['Epreuves'] as Map<String, dynamic>?;
+
+    if (epreuves == null) return [];
+
+    return epreuves.entries
+        .where((entry) =>
+            entry.value is List && (entry.value as List).isNotEmpty)
+        .map((entry) => entry.key)
+        .toList();
   }
   return data.values
       .expand((entry) => (entry['Epreuves'] as Map<String, dynamic>).keys)
@@ -41,19 +48,18 @@ Future<List<String>> getParcours({String? ravito}) async {
 }
 
 Future<Map<String, List<String>>> readJsonEpreuves(ravito) async {
-  final String response = await loadJsonEpreuves();
-  final d = json.decode(response);
+  final response = json.decode(await loadJsonEpreuves());
   final Map<String, dynamic> data;
   if (ravito == 'admin') {
-    final List<String> list_parcours = await getParcours();
+    final List<dynamic> list_parcours = response.values.expand((entry) => (entry['Epreuves'] as Map<String, dynamic>).keys).toSet().toList();
     data = {for (var parcours in list_parcours) parcours: []};
-    for (var r in d.keys) {
+    for (var r in response.keys) {
       for (var p in list_parcours) {
-        data[p] = [data[p], d[r]["Epreuves"][p]].expand((x) => x).toList();
+        data[p] = [data[p], response[r]["Epreuves"][p]].expand((x) => x).toList();
       }
     }
   } else {
-    data = d[ravito]["Epreuves"];
+    data = response[ravito]["Epreuves"];
   }
   final Map<String, List<String>> data2 = Map.fromEntries(
     data.entries.map(
@@ -67,15 +73,14 @@ Future<Map<String, List<String>>> readJsonEpreuves(ravito) async {
 }
 
 Future compteEpreuves() async {
-  final String response = await loadJsonEpreuves();
-  final d = json.decode(response);
-  final List<String> list_parcours = await getParcours();
+  final response = json.decode(await loadJsonEpreuves());
+  final List<dynamic> list_parcours = await response.values.expand((entry) => (entry['Epreuves'] as Map<String, dynamic>).keys).toSet().toList();
   final Map<String, dynamic> data = {
     for (var parcours in list_parcours) parcours: {}
   };
-  for (var r in d.keys) {
+  for (var r in response.keys) {
     for (var p in list_parcours) {
-      data[p][r] = d[r]["Epreuves"][p].length;
+      data[p][r] = response[r]["Epreuves"][p].length;
     }
   }
   return data;

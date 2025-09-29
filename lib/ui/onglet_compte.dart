@@ -17,7 +17,7 @@ class OngletCompte extends HookWidget {
     final dbm = DatabaseManager();
 
     return FutureBuilder<List<dynamic>>(
-      future: Future.wait([getParcours(), dbm.compteTemps(ravito)]),
+      future: Future.wait([getParcours(ravito: ravito), dbm.compteTemps(ravito)]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

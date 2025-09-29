@@ -171,8 +171,7 @@ class DatabaseManager {
       DELETE FROM $tableEquipes
     ''');
 
-    final value = await readJsonEquipes();
-    final List<Map<String, String>> equipes = value;
+    final List<Map<String, String>> equipes = await readJsonEquipes();
     for (int i = 0; i < equipes.length; i++) {
       final Map<String, String> json = equipes[i];
       await db.insert(tableEquipes, json);
@@ -374,7 +373,7 @@ class DatabaseManager {
 
   /// Action
 
-  Future<List<Action>> getAction(String ravito) async {
+  Future<List<Action>> getActions(String ravito) async {
     final db = await instance.database;
     final result = await db.rawQuery('''
       SELECT *
