@@ -10,4 +10,6 @@ android/fastlane/report.xml
 android/fastlane/README.md
 
 # Configuration and secrets
-config
+config/
+!config/config-template.json
+
