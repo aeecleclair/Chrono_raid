@@ -6,7 +6,7 @@
     <!-- <uses-permission android:name="android.permission.FLASHLIGHT" /> -->
    <application
         android:name="${applicationName}"
-        android:label="ChronoRaid"
+        android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">
         <activity
