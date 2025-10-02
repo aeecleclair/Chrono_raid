@@ -3,6 +3,8 @@ build
 .flutter-plugins
 .flutter-plugins-dependencies
 
+.idea/
+
 # Android build
 android/.kotlin/errors
 
@@ -16,3 +18,4 @@ android/fastlane/README.md
 config/
 !config/config-template.json
 android/.kotlin/sessions
+
