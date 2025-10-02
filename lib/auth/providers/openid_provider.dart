@@ -113,7 +113,7 @@ class OpenIdTokenProvider
   final OpenIdRepository openIdRepository = OpenIdRepository();
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   final String tokenName = "my_ecl_auth_token";
-  final String clientId = "Titan";
+  final String clientId = "ChronoRAID";
   final String tokenKey = "token";
   final String refreshTokenKey = "refresh_token";
   final List<String> scopes = ["API"];
