@@ -1,4 +1,4 @@
-package com.example.chronoraid
+package fr.myecl.chronoraid
 
 import io.flutter.embedding.android.FlutterActivity
 
