@@ -8,7 +8,5 @@
 PRODUCT_NAME = chrono_raid
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.chronoRaid
+PRODUCT_BUNDLE_IDENTIFIER = fr.myecl.chronoRaid
 
-// The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2024 com.example. All rights reserved.
