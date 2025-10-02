@@ -427,5 +427,5 @@ bool isNotStaff(String email) {
 }
 
 String getTitanLogo() {
-  return "assets/images/logo_prod.png";
+  return "assets/images/logo.png";
 }
