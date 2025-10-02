@@ -2,3 +2,16 @@ build
 .dart_tool
 .flutter-plugins
 .flutter-plugins-dependencies
+
+# Android build
+android/.kotlin/errors
+
+# Fastlane
+ios/fastlane/report.xml
+ios/fastlane/README.md
+android/fastlane/report.xml
+android/fastlane/README.md
+
+# Configuration and secrets
+config/
+!config/config-template.json
