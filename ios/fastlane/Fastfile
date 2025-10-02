@@ -29,7 +29,7 @@ platform :ios do
     sh "flutter build ipa --dart-define-from-file=config/config.json --release --export-method=app-store"
 
     upload_to_testflight(
-      ipa: "../build/ios/ipa/#{app_name}.ipa",
+      ipa: "../build/ios/ipa/chronoraid.ipa",
       skip_waiting_for_build_processing: true,
       api_key: api_key
     )
