@@ -15,3 +15,4 @@ android/fastlane/README.md
 # Configuration and secrets
 config/
 !config/config-template.json
+android/.kotlin/sessions
