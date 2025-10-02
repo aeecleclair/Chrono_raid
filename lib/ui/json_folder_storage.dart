@@ -10,7 +10,7 @@ class JsonFolderStorage {
 
   // Récupérer le dossier (et le créer si besoin)
   Future<Directory> _getLocalDir() async {
-    final baseDir = await getApplicationDocumentsDirectory();
+    final baseDir = await getApplicationSupportDirectory();
     final dir = Directory('${baseDir.path}/$folderName');
     if (!await dir.exists()) {
       await dir.create(recursive: true);
